@@ -27,7 +27,7 @@ export default function TopProducts() {
       .then((res) => {
         console.log(res);
         setPage(page + 1);
-        setProducts(res.products.products);
+        setProducts(res.products);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -39,7 +39,7 @@ export default function TopProducts() {
         setPage(page + 1);
         setProducts((prevProducts) => [
           ...prevProducts,
-          ...res.products.products,
+          ...res.products,
         ]);
         setLoading(false);
       })

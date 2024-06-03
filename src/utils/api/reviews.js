@@ -40,7 +40,6 @@ export const getProductReviews = (productId) => {
     axios
       .get(`${baseURL}reviews-product/${productId}`)
       .then((res) => {
-        console.log(res)
         resolve(res.data);
       })
       .catch((err) => {

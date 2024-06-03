@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "https://sale-bid.df.r.appspot.com/";
+const baseURL = "http://localhost:3001/";
 const headers = {
   headers: {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -75,13 +75,14 @@ export const addProduct = (
   specification,
   additionalFields,
   images,
+  status,
   fragile
   //YouTubeLink,
 ) => {
   return new Promise(async(resolve, reject) => {
    const json = JSON.stringify(additionalFields);
     const additionalBlob = new Blob([json]);
-
+console.log(images);
     const formData = new FormData();
     formData.append("title", title);
     formData.append("main-barcode", barcode);
@@ -103,6 +104,7 @@ export const addProduct = (
       formData.append("images", image);
     }
     formData.append("fragile", fragile);
+    formData.append("status", status);
     formData.append("pin", false);
     axios
       .post(`${baseURL}products`, formData, {
@@ -140,6 +142,7 @@ export const updateProduct = (
   specification,
   additionalFields,
   images,
+  status,
   fragile,
   pin
 ) => {
@@ -168,6 +171,7 @@ export const updateProduct = (
       formData.append("images", image);
     }
     formData.append("fragile", fragile);
+    formData.append("status", status);
     formData.append("pin", pin);
 
     axios
@@ -220,6 +224,38 @@ export const getProductsByCategory = (category, page = 1, limit = 30) => {
     axios
       .get(
         `${baseURL}products-category/${category}?page=${page}&limit=${limit}`
+      )
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        //onTokenBroken();
+        reject(err);
+      });
+  });
+};
+
+export const getProductsByMainCategory = (category, page = 1, limit = 30) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(
+        `${baseURL}products-main-category/${category}?page=${page}&limit=${limit}`
+      )
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        //onTokenBroken();
+        reject(err);
+      });
+  });
+};
+
+export const getProductsByLetters = (letters, page = 1, limit = 10) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(
+        `${baseURL}products-by-letters?query=${letters}&page=${page}&limit=${limit}`
       )
       .then((res) => {
         resolve(res.data);

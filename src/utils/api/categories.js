@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "https://sale-bid.df.r.appspot.com/";
+const baseURL = "https://sale-bid.df.r.appspot.com/"
 
 export const getCategories = () => {
   return new Promise((resolve, reject) => {

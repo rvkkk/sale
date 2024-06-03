@@ -598,7 +598,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                         icon={BillingIcon}
                         name="כתובת למשלוח"
                       />
-                      <MenuItemComponent
+                   {/*} <MenuItemComponent
                         path={
                           userLogged
                             ? routes.UserSettingsDeliveryTraker.path
@@ -606,7 +606,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                         }
                         icon={SettingsIcon}
                         name="מעקב משלוחים"
-                      />
+                      />*/}
                       <Divider h="1px" bg="#D9D9D9" my="19px" />
 
                       <MenuItemComponent
@@ -671,7 +671,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                 </Menu>
               </Flex>
 
-              <Menu direction="rtl">
+             {/*} <Menu direction="rtl">
                 <MenuButton
                   role="button"
                   aria-label="show website details"
@@ -710,7 +710,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                     website={window.localStorage.getItem("website") || {}}
                   />
                 </MenuList>
-              </Menu>
+                  </Menu>*/}
             </Flex>
           </Flex>
         </Box>
@@ -782,9 +782,9 @@ export default function NavBar({ withSidebar, logo, change }) {
                 aria-label="link to sales"
                 role="button"
               >
-                מבצעים
+                מכירות רגילות
               </ChakraButton>
-              <ChakraButton
+             {/*} <ChakraButton
                 variant="link"
                 px="4"
                 textColor="primary"
@@ -802,7 +802,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                 role="button"
               >
                 קנייה
-              </ChakraButton>
+              </ChakraButton>*/}
               <ChakraButton
                 variant="link"
                 px="4"
@@ -1008,7 +1008,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                     icon={BillingIcon}
                     name="כתובת למשלוח"
                   />
-                  <MenuItemComponent
+               {/*} <MenuItemComponent
                     path={
                       userLogged
                         ? routes.UserSettingsDeliveryTraker.path
@@ -1016,7 +1016,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                     }
                     icon={SettingsIcon}
                     name="מעקב משלוחים"
-                  />
+                  />*/}
                   <Divider h="1px" bg="#D9D9D9" my="19px" />
 
                   <MenuItemComponent
@@ -1372,7 +1372,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                       >
                         קנייה מיידית
                       </ChakraButton>
-                      <ChakraButton
+                      {/*<ChakraButton
                         h="50px"
                         fontSize="18px"
                         fontWeight="normal"
@@ -1387,7 +1387,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                         }
                       >
                         מבצעים
-                      </ChakraButton>
+                      </ChakraButton>*/}
                       <ChakraButton
                         h="50px"
                         fontSize="18px"
@@ -1425,29 +1425,13 @@ export default function NavBar({ withSidebar, logo, change }) {
             </Popover>
           </Flex>
         </Flex>
-        <Flex gap="8px" px={{ sm: "70px" }}>
-          <IconButton
-            aria-label="search"
-            role="button"
-            minW="50px"
-            h="50px"
-            bgGradient="linear(to-r, #FF66A9, #F53689)"
-            _hover={{ bgGradient: "linear(to-r, #F53689, #F53689)" }}
-            borderRadius="14px"
-            icon={<SearchIcon />}
-            onClick={() => (window.location.href = "/category?query=" + query)}
-          />
-          <Input
-            dir="rtl"
-            h="50px"
-            placeholder="אני מחפש..."
-            border="none"
-            borderRadius="14px"
-            bg="white"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </Flex>
+        <SearchComponent
+                value={query}
+                onChange={(e) => setQuery(e)}
+                onClick={() =>
+                  (window.location.href = "/category?query=" + query)
+                }
+              />
       </Flex>
     </>
   );
@@ -1515,7 +1499,12 @@ const MenuItemCategory = () => {
           {topCategories[0] &&
             topCategories.slice(0, 5).map((category, index) => (
               <Flex flexDir="column" gap="10px" w="110px" key={index}>
-                <Flex dir="rtl" gap="3px" alignItems="center">
+                <Flex dir="rtl" gap="3px" alignItems="center" onClick={() => {
+                    window.location.href = `${routes.Categories.path.replace(
+                      ":category",
+                      ""
+                    )}${category.title}`;
+                  }}>
                   <Text fontSize="14px" fontWeight="semibold">
                     {category.name}
                   </Text>
@@ -1562,7 +1551,12 @@ const MenuItemCategory = () => {
           {topCategories[0] &&
             topCategories.slice(5, 10).map((category, index) => (
               <Flex flexDir="column" gap="10px" w="110px" key={index}>
-                <Flex dir="rtl" gap="3px" alignItems="center">
+                <Flex dir="rtl" gap="3px" alignItems="center" onClick={() => {
+                    window.location.href = `${routes.Categories.path.replace(
+                      ":category",
+                      ""
+                    )}${category.title}`;
+                  }}>
                   <Text fontSize="14px" fontWeight="semibold">
                     {category.name}
                   </Text>

@@ -37,20 +37,25 @@ export const getUserAProducts = () => {
 
 export const addAuctionProduct = (
   title,
-  description,
-  technicalDetails,
-  productSpecs,
-  status,
-  category,
-  brand,
+  barcode,
   openingPrice,
-  closingPrice,
-  minPrice,
-  maxPrice,
   startTime,
   timeFrame,
-  pictures,
-  video,
+  warranty,
+  category,
+  description,
+  additionalInfo,
+  properties,
+  notes,
+  kitInclude,
+  quantity,
+  deliveryTime,
+  modelName,
+  specification,
+  additionalFields,
+  images,
+  status,
+  fragile
 ) => {
   return new Promise((resolve, reject) => {
     axios
@@ -58,20 +63,25 @@ export const addAuctionProduct = (
         `${baseURL}auction-products`,
         {
           title,
-          description,
-          technicalDetails,
-          productSpecs,
-          status,
-          category,
-          brand,
+          barcode,
           openingPrice,
-          closingPrice,
-          minPrice,
-          maxPrice,
           startTime,
           timeFrame,
-          pictures,
-          video,
+          warranty,
+          category,
+          description,
+          additionalInfo,
+          properties,
+          notes,
+          kitInclude,
+          quantity,
+          deliveryTime,
+          modelName,
+          specification,
+          additionalFields,
+          images,
+          status,
+          fragile,
         },
         headers
       )
@@ -88,20 +98,25 @@ export const addAuctionProduct = (
 export const updateAuctionProduct = (
   id,
   title,
-  description,
-  technicalDetails,
-  productSpecs,
-  status,
-  category,
-  brand,
+  barcode,
   openingPrice,
-  minPrice,
-  maxPrice,
   startTime,
   timeFrame,
+  warranty,
+  category,
+  description,
+  additionalInfo,
+  properties,
+  notes,
+  kitInclude,
+  quantity,
+  deliveryTime,
+  modelName,
+  specification,
+  additionalFields,
   images,
-  video,
-  pin,
+  status,
+  fragile
 ) => {
   return new Promise((resolve, reject) => {
     axios
@@ -109,20 +124,25 @@ export const updateAuctionProduct = (
         `${baseURL}auction-products/${id}`,
         {
           title,
-          description,
-          technicalDetails,
-          productSpecs,
-          status,
-          category,
-          brand,
+          barcode,
           openingPrice,
-          minPrice,
-          maxPrice,
           startTime,
           timeFrame,
+          warranty,
+          category,
+          description,
+          additionalInfo,
+          properties,
+          notes,
+          kitInclude,
+          quantity,
+          deliveryTime,
+          modelName,
+          specification,
+          additionalFields,
           images,
-          video,
-          pin,
+          status,
+          fragile,
         },
         headers
       )
@@ -150,10 +170,10 @@ export const deleteAuctionProduct = (id) => {
   });
 };
 
-export const getAuctionProducts = () => {
+export const getAuctionProducts = (page = 1, limit = 30) => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`${baseURL}auction-products`)
+      .get(`${baseURL}auction-products?page=${page}&limit=${limit}`)
       .then((res) => {
         resolve(res.data);
       })
@@ -164,10 +184,28 @@ export const getAuctionProducts = () => {
   });
 };
 
-export const getAProductsByCategory = (category) => {
+export const getAProductsByCategory = (category, page = 1, limit = 30) => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`${baseURL}auction-products-category/${category}`)
+      .get(
+        `${baseURL}auction-products-category/${category}?page=${page}&limit=${limit}`
+      )
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        //onTokenBroken();
+        reject(err);
+      });
+  });
+};
+
+export const getAProductsByLetters = (letters, page = 1, limit = 10) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(
+        `${baseURL}auction-products-by-letters?query=${letters}&page=${page}&limit=${limit}`
+      )
       .then((res) => {
         resolve(res.data);
       })

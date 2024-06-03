@@ -1,13 +1,5 @@
 import React, { useState } from "react";
-import {
-  Flex,
-  Heading,
-  Image,
-  Text,
-  Link,
-  Grid,
-  Box,
-} from "@chakra-ui/react";
+import { Flex, Heading, Image, Text, Link, Grid, Box } from "@chakra-ui/react";
 import SignUpLayout from "../components/AuthLayout";
 import Button from "../components/Button";
 import Checkbox from "../components/CheckBox";
@@ -151,7 +143,9 @@ export default function SignUp() {
                 addToMailingList(email)
                   .then((res) => console.log(res))
                   .catch((err) => console.log(err));
-              window.location.href = routes.HOME.path;
+              const p = window.localStorage.getItem("new product");
+              if (p) window.location.href = routes.CreateProduct.path;
+              else window.location.href = routes.HOME.path;
             } else {
               setError("ארעה שגיאה, אנא נסה שנית במועד מאוחר יותר");
             }
@@ -407,7 +401,10 @@ export default function SignUp() {
                     fontWeight="normal"
                   >
                     <span>Sign in with Google</span>
-                    <Image width="25px" src={process.env.PUBLIC_URL + "/assets/Google.svg"} />
+                    <Image
+                      width="25px"
+                      src={process.env.PUBLIC_URL + "/assets/Google.svg"}
+                    />
                   </Button.Secondary>
                 </Flex>
 
@@ -712,7 +709,10 @@ export default function SignUp() {
                         <Text fontSize="18px" fontWeight="medium">
                           Sign in with Google
                         </Text>
-                        <Image width="30px" src={process.env.PUBLIC_URL + "/assets/Google.svg"} />
+                        <Image
+                          width="30px"
+                          src={process.env.PUBLIC_URL + "/assets/Google.svg"}
+                        />
                       </Button.Secondary>
                       <Flex w="full" justifyContent="center" gap="2">
                         <Text fontSize="16px" color="naturalDarkest">

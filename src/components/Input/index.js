@@ -348,18 +348,18 @@ export const ExeptionInput = (props) => {
           {...props}
         >
           {props.years
-            ? props.years.map((year) => (
+            ? props.years.map((year, key) => (
                 <option key={year} value={year}>
                   {year}
                 </option>
               ))
             : props.months
-            ? props.months.map((year) => (
+            ? props.months.map((year, key) => (
                 <option key={year} value={year}>
                   {year}
                 </option>
               ))
-            : props.numbers.map((number) => (
+            : props.numbers.map((number, key) => (
                 <option key={number} value={number}>
                   {number}
                 </option>
@@ -431,13 +431,13 @@ export const CategoryInput = (props) => {
           {...props}
         >
           {props.categories && props.categories.length > 0
-            ? props.categories.map((category) => (
+            ? props.categories.map((category, key) => (
                 <option w="200px" key={category.title} value={category.title}>
                   {category.name}
                 </option>
               ))
             : props.subcategories && props.subcategories.length > 0
-            ? props.subcategories.map((subcategory) => (
+            ? props.subcategories.map((subcategory, key) => (
                 <option key={subcategory.title} value={subcategory.name}>
                   {subcategory.name}
                 </option>

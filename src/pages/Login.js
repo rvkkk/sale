@@ -7,6 +7,7 @@ import Input, { PasswordField } from "../components/Input";
 import SEOWrapper from "../components/SEO";
 import { routes } from "../routes";
 import { login } from "../utils/api/users";
+import { addProduct } from "../utils/api/products";
 import Loader from "../components/Loader";
 import { RightIcon2 } from "../components/Icons";
 import Layout from "../components/Layout";
@@ -69,7 +70,9 @@ export default function Login() {
                 window.localStorage.setItem("password", password);
               }
               window.localStorage.setItem("token", res.token);
-              window.location.href = routes.HOME.path;
+              const p = window.localStorage.getItem("new product");
+              if (p) window.location.href = routes.CreateProduct.path;
+              else window.location.href = routes.HOME.path;
             } else {
               setLoading(false);
               setError("שם משתמש או סיסמה שגויים");
@@ -89,7 +92,44 @@ export default function Login() {
                 window.localStorage.setItem("password", password);
               }
               window.localStorage.setItem("token", res.token);
-              window.location.href = routes.HOME.path;
+              const p = window.localStorage.getItem("new product");
+              if (p) {
+                if(!p.auction)
+                {
+                addProduct(
+                  p.name,
+                  p.barcode,
+                  p.price,
+                  p.priceBefore,
+                  p.warranty,
+                  p.subcategory,
+                  p.description,
+                  p.additionalInfo,
+                  p.properties,
+                  p.notes,
+                  p.kitInclude,
+                  p.quantity,
+                  p.deliveryTime,
+                  p.modelName,
+                  p.specification,
+                  p.additionalFields,
+                  p.pictures,
+                  p.status,
+                  p.fragile
+                )
+                  .then((res) => {
+                    console.log(res);
+                    if (res.status === "ok") {
+                      setLoading(false);
+                      window.location.href = routes.UserSettingsMySales.path;
+                    } else {
+                      setLoading(false);
+                      alert("שגיאה ביצירת מכירה חדשה");
+                    }
+                  })
+               // window.location.href = routes.CreateProduct.path;
+              }}
+              else window.location.href = routes.HOME.path;
             } else {
               setLoading(false);
               setError("שם משתמש או סיסמה שגויים");

@@ -28,6 +28,7 @@ import UserSettingsWishList from "../pages/UserSettingsWishList";
 import CreatePArticle from "../pages/createPArticle";
 import AddCategory from "../pages/AddCategory";
 import Categories from "../pages/Categories";
+import SearchResults from "../pages/searchResults";
 
 export const routes = {
     LOGIN: {
@@ -61,6 +62,10 @@ export const routes = {
     Categories: {
         path: "/:category",
         component: Categories
+    },
+    SearchResults: {
+        path: "/search-results/:query",
+        component: SearchResults
     },
     ProductPage: {
         path: "/product/:id",

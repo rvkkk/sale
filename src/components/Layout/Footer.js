@@ -13,7 +13,7 @@ import {
   MenuItem,
 } from "@chakra-ui/react";
 import { extendTheme } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Container from "../Container";
 import {
   FaFacebookF,
@@ -33,6 +33,7 @@ import {
 } from "../Icons";
 import { EmailIcon } from "@chakra-ui/icons";
 import { addToMailingList } from "../../utils/api/mailingList";
+import { getTopCategories } from "../../utils/api/categories";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -40,12 +41,34 @@ export default function Footer() {
   const [country, setCountry] = useState("Israel");
   const [language, setLanguage] = useState("עברית");
   const [coin, setCoin] = useState("שקל");
+  const [topCategories, setTopCategories] = useState([]);
+
+  useEffect(() => {
+    getTopCategories()
+      .then((res) => {
+        setTopCategories(res.categories);
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
+  }, []);
 
   const link1 = [
-    { name: "לבית ולמשרד", path: "" },
-    { name: "מוצרי חשמל", path: "" },
-    { name: "אספנות", path: "" },
-    { name: "טיפוח", path: "" },
+    { name: topCategories[0] && topCategories[0].name, path: topCategories[0] && `${routes.Categories.path.replace(
+        ":category",
+        ""
+      )}${topCategories[0].title}`},
+    { name: topCategories[0] && topCategories[1].name, path: topCategories[0] && `${routes.Categories.path.replace(
+      ":category",
+      ""
+    )}${topCategories[1].title}`},
+    { name: topCategories[0] && topCategories[2].name, path: topCategories[0] && `${routes.Categories.path.replace(
+      ":category",
+      ""
+    )}${topCategories[2].title}`},
+    { name: topCategories[0] && topCategories[3].name, path: topCategories[0] && `${routes.Categories.path.replace(
+      ":category",
+      ""
+    )}${topCategories[3].title}`},
   ];
   const link2 = [
     { name: "אודות", path: routes.About.path },

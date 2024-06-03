@@ -35,7 +35,7 @@ export default function Products({
     if (category === "")
       getProducts(1, 25)
         .then((res) => {
-          setProducts(res.products.products);
+          setProducts(res.products);
           console.log(res);
         })
         .catch((err) => {
@@ -44,7 +44,7 @@ export default function Products({
     else
       getProductsByCategory(category, 1, 25)
         .then((res) => {
-          setProducts(res.products.products);
+          setProducts(res.products);
           console.log(res);
         })
         .catch((err) => {
