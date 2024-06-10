@@ -112,13 +112,13 @@ export default function Category() {
   }, [category, sortBy]);*/
 
   const getProducts = (categoryName) => {
-    setLoading(true);
+   // setLoading(true);
     searchProducts(categoryName, tags, 1, 21, minPrice, maxPrice, sortBy)
       .then((res) => {
         console.log(res);
         setProducts(res.products.products);
         setPages(res.products.pages);
-        setLoading(false);
+        //setLoading(false);
       })
       .catch((err) => console.log(err));
   };

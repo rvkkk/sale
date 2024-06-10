@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "https://sale-bid.df.r.appspot.com/";
+const baseURL = "http://localhost:3001/";
 const headers = {
   headers: {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -40,6 +40,7 @@ export const addAuctionProduct = (
   barcode,
   openingPrice,
   startTime,
+  endTime,
   timeFrame,
   warranty,
   category,
@@ -48,7 +49,6 @@ export const addAuctionProduct = (
   properties,
   notes,
   kitInclude,
-  quantity,
   deliveryTime,
   modelName,
   specification,
@@ -58,33 +58,39 @@ export const addAuctionProduct = (
   fragile
 ) => {
   return new Promise((resolve, reject) => {
+    const json = JSON.stringify(additionalFields);
+    const additionalBlob = new Blob([json]);
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("main-barcode", barcode);
+    formData.append("openingPrice", openingPrice);
+    formData.append("warranty", warranty);
+    formData.append("category", category);
+    formData.append("description", description);
+    formData.append("additional-information", additionalInfo);
+    formData.append("properties", properties);
+    formData.append("notes", notes);
+    formData.append("kit-include", kitInclude);
+    formData.append("delivery-time", deliveryTime);
+    formData.append("model-name", modelName);
+    formData.append("specification", specification);
+    formData.append("additional-fields", additionalBlob);
+    for (const image of images) {
+      formData.append("images", image);
+    }
+    formData.append("startTime", startTime);
+    formData.append("endTime", endTime);
+    formData.append("timeFrame", timeFrame);
+    formData.append("fragile", fragile);
+    formData.append("status", status);
+    formData.append("pin", false);
     axios
-      .post(
-        `${baseURL}auction-products`,
-        {
-          title,
-          barcode,
-          openingPrice,
-          startTime,
-          timeFrame,
-          warranty,
-          category,
-          description,
-          additionalInfo,
-          properties,
-          notes,
-          kitInclude,
-          quantity,
-          deliveryTime,
-          modelName,
-          specification,
-          additionalFields,
-          images,
-          status,
-          fragile,
+      .post(`${baseURL}auction-products`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        headers
-      )
+      })
       .then((res) => {
         resolve(res.data);
       })
@@ -101,6 +107,7 @@ export const updateAuctionProduct = (
   barcode,
   openingPrice,
   startTime,
+  endTime,
   timeFrame,
   warranty,
   category,
@@ -109,7 +116,6 @@ export const updateAuctionProduct = (
   properties,
   notes,
   kitInclude,
-  quantity,
   deliveryTime,
   modelName,
   specification,
@@ -119,33 +125,39 @@ export const updateAuctionProduct = (
   fragile
 ) => {
   return new Promise((resolve, reject) => {
+    const json = JSON.stringify(additionalFields);
+    const additionalBlob = new Blob([json]);
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("main-barcode", barcode);
+    formData.append("openingPrice", openingPrice);
+    formData.append("warranty", warranty);
+    formData.append("category", category);
+    formData.append("description", description);
+    formData.append("additional-information", additionalInfo);
+    formData.append("properties", properties);
+    formData.append("notes", notes);
+    formData.append("kit-include", kitInclude);
+    formData.append("delivery-time", deliveryTime);
+    formData.append("model-name", modelName);
+    formData.append("specification", specification);
+    formData.append("additional-fields", additionalBlob);
+    for (const image of images) {
+      formData.append("images", image);
+    }
+    formData.append("startTime", startTime);
+    formData.append("endTime", endTime);
+    formData.append("timeFrame", timeFrame);
+    formData.append("fragile", fragile);
+    formData.append("status", status);
+    formData.append("pin", false);
     axios
-      .patch(
-        `${baseURL}auction-products/${id}`,
-        {
-          title,
-          barcode,
-          openingPrice,
-          startTime,
-          timeFrame,
-          warranty,
-          category,
-          description,
-          additionalInfo,
-          properties,
-          notes,
-          kitInclude,
-          quantity,
-          deliveryTime,
-          modelName,
-          specification,
-          additionalFields,
-          images,
-          status,
-          fragile,
+      .patch(`${baseURL}auction-products/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        headers
-      )
+      })
       .then((res) => {
         resolve(res.data);
       })

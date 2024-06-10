@@ -82,7 +82,6 @@ export const addProduct = (
   return new Promise(async(resolve, reject) => {
    const json = JSON.stringify(additionalFields);
     const additionalBlob = new Blob([json]);
-console.log(images);
     const formData = new FormData();
     formData.append("title", title);
     formData.append("main-barcode", barcode);
@@ -143,8 +142,7 @@ export const updateProduct = (
   additionalFields,
   images,
   status,
-  fragile,
-  pin
+  fragile
 ) => {
   return new Promise((resolve, reject) => {
     const json = JSON.stringify(additionalFields);
@@ -172,8 +170,6 @@ export const updateProduct = (
     }
     formData.append("fragile", fragile);
     formData.append("status", status);
-    formData.append("pin", pin);
-
     axios
       .patch(`${baseURL}products/${id}`, formData, {
         headers: {

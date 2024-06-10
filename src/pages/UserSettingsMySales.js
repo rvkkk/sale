@@ -23,6 +23,7 @@ import {
   sortOpenAuctions,
   sortCloseAuctions,
   sortFutureAuctions,
+  sortNewest,
 } from "../utils/sort";
 import Loader from "../components/Loader";
 
@@ -48,12 +49,12 @@ export default function UserSettingsMySales() {
           getUserAProducts().then((resp) => {
             console.log(resp);
             setMyAProducts(resp.products);
-            setGallery([...res.products, ...resp.products]);
+            setGallery(sortNewest([...res.products, ...resp.products]));
             setPages(Math.ceil(gallery / 12));
+            setLoading(false);
           });
         })
         .catch((err) => console.log(err));
-      setLoading(false);
       setDataFetched(true);
     }
   }, [dataFetched]);
@@ -87,9 +88,14 @@ export default function UserSettingsMySales() {
         <>
           <Box py="20" ml="15%">
             <Flex alignItems="center" justifyContent="space-between">
+              <Flex gap={4}>
               <Text fontSize="32px" lineHeight="20px" fontWeight="medium" color="naturalBlack">
                 כל המכירות שלי
               </Text>
+              <Text fontSize="20px" lineHeight="20px" color="naturalBlack">
+                ({myProducts.length + myAProducts.length} מכירות)
+              </Text>
+              </Flex>
 
               {galleryPage && <Menu>
                 <MenuButton

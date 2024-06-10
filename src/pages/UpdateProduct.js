@@ -29,6 +29,8 @@ import React from "react";
 import Bbutton from "../components/Button";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+//import { DatePicker, TimePicker } from "react-rainbow-components";
+import { format } from "date-fns";
 import { AiFillExclamationCircle, AiOutlinePicture } from "react-icons/ai";
 import { HiArrowDown } from "react-icons/hi";
 import Container from "../components/Container";
@@ -40,8 +42,12 @@ import ProductImageSelect from "../components/ProductImageSelect";
 import TextArea from "../components/TextArea";
 import Loader from "../components/Loader";
 import { useState, useEffect } from "react";
-import { addProduct } from "../utils/api/products";
-import { addAuctionProduct } from "../utils/api/auctionProducts";
+import { addProduct, getProduct, updateProduct } from "../utils/api/products";
+import {
+  addAuctionProduct,
+  getAuctionProduct,
+  updateAuctionProduct,
+} from "../utils/api/auctionProducts";
 import { routes } from "../routes";
 import { CloseIcon } from "@chakra-ui/icons";
 import { getCategories } from "../utils/api/categories";
@@ -54,6 +60,7 @@ export default function CreateProduct() {
   const [loading, setLoading] = useState(false);
   const [auction, setAuction] = useState(true);
   const [shadow, setShadow] = useState(1);
+  const id = window.location.href.split("/").pop().split("/")[0];
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [subcategory, setSubcategory] = useState("");
@@ -78,13 +85,13 @@ export default function CreateProduct() {
   const [fragile, setFragile] = useState(false);
   const [status, setStatus] = useState("לא רלוונטי");
   /*const [width, setWidth] = useState("");
-  const [height, setHeight] = useState("");
-  const [thickness, setThickness] = useState("");
-  const [weight, setWeight] = useState("");*/
+    const [height, setHeight] = useState("");
+    const [thickness, setThickness] = useState("");
+    const [weight, setWeight] = useState("");*/
   const [openingPrice, setOpeningPrice] = useState("");
   /* const [closingPrice, setClosingPrice] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");*/
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");*/
   const [startTime, setStartTime] = useState(null);
   const [time, setTime] = useState(1);
   const [timeFrame, setTimeFrame] = useState(2);
@@ -92,7 +99,7 @@ export default function CreateProduct() {
   const [priceBefore, setPriceBefore] = useState("");
   const [quantity, setQuantity] = useState("");
   const [pictures, setPictures] = useState([]);
-  const [mainPicture, setMainPicture] = useState({});
+  const [mainPicture, setMainPicture] = useState(null);
   //const [video, setVideo] = useState("");
   const [disable, setDisable] = useState(true);
   const [selectedDate, setSelectedDate] = useState("");
@@ -113,26 +120,26 @@ export default function CreateProduct() {
   const handleDateTimeSubmit = () => {
     if (selectedDate) {
       let fullDateTime;
-      if(selectedTime)
-      fullDateTime = new Date(
-        selectedDate.getFullYear(),
-        selectedDate.getMonth(),
-        selectedDate.getDate(),
-        selectedTime.getHours(),
-        selectedTime.getMinutes()
-      );
+      if (selectedTime)
+        fullDateTime = new Date(
+          selectedDate.getFullYear(),
+          selectedDate.getMonth(),
+          selectedDate.getDate(),
+          selectedTime.getHours(),
+          selectedTime.getMinutes()
+        );
       else
-      fullDateTime = new Date(
-        selectedDate.getFullYear(),
-        selectedDate.getMonth(),
-        selectedDate.getDate()
-      );
+        fullDateTime = new Date(
+          selectedDate.getFullYear(),
+          selectedDate.getMonth(),
+          selectedDate.getDate()
+        );
       setStartTime(fullDateTime.toISOString());
       console.log("Selected Date & Time:", fullDateTime);
     }
   };
 
-  const createProduct = () => {
+  const update = () => {
     if (category === "") setInvalidMainCategory("שדה חובה");
     if (subcategory === "") setInvalidCategory("שדה חובה");
     if (name === "") setInvalidName("שדה חובה");
@@ -153,24 +160,21 @@ export default function CreateProduct() {
       ) {
         if (token === null) return openLogin();
         setLoading(true);
-        const images = mainPicture.url
-          ? [mainPicture, ...pictures.filter((p) => p.url !== mainPicture.url)]
+        const images = mainPicture
+          ? [mainPicture, ...pictures.filter((p) => p !== mainPicture)]
           : pictures;
-        const filesOnly = [];
-        images.forEach(({ image, name, size, type }, index) => {
-          const file = base64ToFile(image, name, size, type);
-          filesOnly.push(file);
-        });
+        const filesOnly = images.map((imageObj) => imageObj.image ||imageObj);
+        console.log(filesOnly)
         let start = startTime;
-        if(start === null)
-{
-  const now = new Date();
-  start = now.toISOString();
-}
-const date = new Date(start);
-  date.setDate(date.getDate() + timeFrame);
-  const end = date.toISOString();
-        addAuctionProduct(
+        if (start === null) {
+          const now = new Date();
+          start = now.toISOString();
+        }
+        const date = new Date(start);
+        date.setDate(date.getDate() + timeFrame);
+        const end = date.toISOString();
+        updateAuctionProduct(
+          id,
           name,
           barcode,
           openingPrice,
@@ -194,7 +198,6 @@ const date = new Date(start);
         ).then((res) => {
           console.log(res);
           if (res.status === "ok") {
-            window.localStorage.removeItem("new product")
             window.location.href = routes.UserSettingsMySales.path;
           } else {
             setLoading(false);
@@ -218,16 +221,13 @@ const date = new Date(start);
       ) {
         if (token === null) return openLogin();
         setLoading(true);
-        const images = mainPicture.url
-          ? [mainPicture, ...pictures.filter((p) => p.url !== mainPicture.url)]
+        const images = mainPicture
+          ? [mainPicture, ...pictures.filter((p) => p !== mainPicture)]
           : pictures;
-        //const filesOnly = images.map((imageObj) => imageObj.image);
-        const filesOnly = [];
-        images.forEach(({ image, name, size, type }, index) => {
-          const file = base64ToFile(image, name, size, type);
-          filesOnly.push(file);
-        });
-        addProduct(
+        const filesOnly = images.map((imageObj) => imageObj.image ||imageObj);
+        console.log(filesOnly)
+        updateProduct(
+          id,
           name,
           barcode,
           price,
@@ -251,7 +251,6 @@ const date = new Date(start);
           .then((res) => {
             console.log(res);
             if (res.status === "ok") {
-              window.localStorage.removeItem("new product")
               window.location.href = routes.UserSettingsMySales.path;
             } else {
               setLoading(false);
@@ -265,103 +264,6 @@ const date = new Date(start);
           });
       } else return openFillAll();
     }
-  };
-
-  // המרת Blob (או File) למחרוזת Base64
-  const blobToBase64 = (blob) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-      reader.readAsDataURL(blob);
-    });
-  };
-
-  // המרת מחרוזת Base64 לאובייקט File
-  const base64ToFile = (base64, name, size, type) => {
-    const base64Data = base64.split(",")[1];
-    // המרת המחרוזת Base64 למערך של בתים (bytes)
-    const byteCharacters = atob(base64Data);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    // יצירת ArrayBuffer מהבתים
-    const byteArray = new Uint8Array(byteNumbers);
-    // יצירת Blob מה-ArrayBuffer
-    const blob = new Blob([byteArray], { type });
-    // יצירת אובייקט File מה-Blob
-    const file = new File([blob], name, {
-      type: type,
-      lastModified: new Date().getTime(),
-    });
-    // העתקת מאפיינים נוספים (לא סטנדרטיים) לאובייקט File
-    Object.defineProperties(file, {
-      size: { value: size, writable: false },
-    });
-    return file;
-  };
-
-  const handleSaveToLS = async () => {
-    const images = mainPicture.url
-      ? [mainPicture, ...pictures.filter((p) => p.url !== mainPicture.url)]
-      : pictures;
-    if (!auction) {
-      localStorage.setItem(
-        "new product",
-        JSON.stringify({
-          auction,
-          name,
-          barcode,
-          price,
-          priceBefore,
-          warranty,
-          category,
-          subcategory,
-          description,
-          additionalInfo,
-          properties,
-          notes,
-          kitInclude,
-          quantity,
-          deliveryTime,
-          modelName,
-          specification,
-          additionalFields,
-          pictures: images,
-          status,
-          fragile,
-        })
-      );
-    } else {
-      localStorage.setItem(
-        "new product",
-        JSON.stringify({
-          auction,
-          name,
-          barcode,
-          openingPrice,
-          startTime,
-          timeFrame,
-          warranty,
-          category,
-          description,
-          additionalInfo,
-          properties,
-          notes,
-          kitInclude,
-          quantity,
-          deliveryTime,
-          modelName,
-          specification,
-          additionalFields,
-          pictures: images,
-          status,
-          fragile,
-        })
-      );
-    }
-    window.location.href = routes.LOGIN.path;
   };
 
   const deleteAll = () => {
@@ -383,9 +285,9 @@ const date = new Date(start);
     setFragile(false);
     setStatus("לא רלוונטי");
     /*setWidth("");
-    setHeight("");
-    setThickness("");
-    setWeight("");*/
+      setHeight("");
+      setThickness("");
+      setWeight("");*/
     setPrice("");
     setPriceBefore("");
     setQuantity("");
@@ -446,38 +348,62 @@ const date = new Date(start);
   }, [category]);
 
   useEffect(() => {
-    const newProduct = window.localStorage.getItem("new product");
-    if (newProduct) {
-      const p = JSON.parse(newProduct);
-      setAuction(p.auction);
-      setName(p.name);
-      setBarcode(p.barcode);
-      setWarranty(p.warranty);
-      setCategory(p.category);
-      setSubcategory(p.subcategory);
-      setDescription(p.description);
-      setAdditionalInfo(p.additionalInfo);
-      setProperties(p.properties);
-      setNotes(p.notes);
-      setKitInclude(p.kitInclude);
-      setDeliveryTime(p.deliveryTime);
-      setModelName(p.modelName);
-      setSpecification(p.specification);
-      setAdditionalFields(p.additionalFields);
-      setPictures(p.pictures);
-      setStatus(p.status);
-      setFragile(p.fragile);
-      console.log(p);
-      if (!p.auction) {
-        setPrice(p.price);
-        setPriceBefore(p.priceBefore);
-        setQuantity(p.quantity);
-        setShadow(2);
-      } else {
-        setOpeningPrice(p.openingPrice);
-
-      }
-    }
+    getProduct(id)
+      .then((res) => {
+        const p = res.product;
+        console.log(p);
+        if (p) {
+          setAuction(false);
+          setName(p.title);
+          setBarcode(p.barcode);
+          setWarranty(p.warranty);
+          setCategory(p.mainCategory.title);
+          setSubcategory(p.category.name);
+          setDescription(p.description);
+          setAdditionalInfo(p["additional-information"]);
+          setProperties(p.properties);
+          setNotes(p.notes);
+          setKitInclude(p["kit-include"]);
+          setDeliveryTime(p["delivery-time"]);
+          setModelName(p["model-name"]);
+          setSpecification(p.specification);
+          setAdditionalFields(p["additional-fields"]);
+          setPictures(p.images);
+          setStatus(p.status);
+          setFragile(p.fragile);
+          setPrice(p.price);
+          setPriceBefore(p["price-before-discount"]);
+          setQuantity(p.quantity);
+          setShadow(2);
+        } else
+          getAuctionProduct(id).then((res) => {
+            const p = res.product;
+            setName(p.title);
+            setBarcode(p.barcode);
+            setWarranty(p.warranty);
+            setCategory(p.mainCategory.title);
+            setSubcategory(p.category.name);
+            setDescription(p.description);
+            setAdditionalInfo(p["additional-information"]);
+            setProperties(p.properties);
+            setNotes(p.notes);
+            setKitInclude(p["kit-include"]);
+            setDeliveryTime(p["delivery-time"]);
+            setModelName(p["model-name"]);
+            setSpecification(p.specification);
+            setAdditionalFields(p["additional-fields"]);
+            setPictures(p.images);
+            setStatus(p.status);
+            setFragile(p.fragile);
+            setOpeningPrice(p.openingPrice);
+            setStartTime(new Date(p.startTime));
+            setTime(2);
+            setSelectedDate(new Date(p.startTime))
+            setSelectedTime(new Date(p.startTime))
+            setTimeFrame(p.timeFrame);
+          });
+      })
+      .catch((err) => console.log(err));
   }, []);
 
   return (
@@ -501,11 +427,11 @@ const date = new Date(start);
                 display={{ base: "none", md: "flex" }}
                 gap="2"
                 onClick={() => {
-                  window.location.href = routes.HOME.path;
+                  window.location.href = routes.UserSettingsMySales.path;
                 }}
               >
                 <ShareIcon />
-                <Text>בחזרה לאתר</Text>
+                <Text>בחזרה למכירות שלי</Text>
               </Flex>
               <Flex
                 display={{ base: "flex", md: "none" }}
@@ -864,46 +790,46 @@ const date = new Date(start);
                     </Flex>
                   </Flex>
                   {/*<Title name="מידות המוצר" />
-                  <Grid
-                    gridTemplateColumns={{
-                      base: "repeat(2, 1fr)",
-                      md: "repeat(4, 1fr)",
-                    }}
-                    gap={{ base: "10px", md: "4" }}
-                  >
-                    <Input
-                      value={width}
-                      label="רוחב"
-                      labelFontSize="14px"
-                      type="number"
-                      light
-                      onChange={(e) => setWidth(e.target.value)}
-                    />
-                    <Input
-                      value={height}
-                      label="גובה"
-                      labelFontSize="14px"
-                      type="number"
-                      light
-                      onChange={(e) => setHeight(e.target.value)}
-                    />
-                    <Input
-                      value={thickness}
-                      label="עובי"
-                      labelFontSize="14px"
-                      type="number"
-                      light
-                      onChange={(e) => setThickness(e.target.value)}
-                    />
-                    <Input
-                      value={weight}
-                      label="משקל"
-                      labelFontSize="14px"
-                      type="number"
-                      light
-                      onChange={(e) => setWeight(e.target.value)}
-                    />
-                  </Grid>*/}
+                    <Grid
+                      gridTemplateColumns={{
+                        base: "repeat(2, 1fr)",
+                        md: "repeat(4, 1fr)",
+                      }}
+                      gap={{ base: "10px", md: "4" }}
+                    >
+                      <Input
+                        value={width}
+                        label="רוחב"
+                        labelFontSize="14px"
+                        type="number"
+                        light
+                        onChange={(e) => setWidth(e.target.value)}
+                      />
+                      <Input
+                        value={height}
+                        label="גובה"
+                        labelFontSize="14px"
+                        type="number"
+                        light
+                        onChange={(e) => setHeight(e.target.value)}
+                      />
+                      <Input
+                        value={thickness}
+                        label="עובי"
+                        labelFontSize="14px"
+                        type="number"
+                        light
+                        onChange={(e) => setThickness(e.target.value)}
+                      />
+                      <Input
+                        value={weight}
+                        label="משקל"
+                        labelFontSize="14px"
+                        type="number"
+                        light
+                        onChange={(e) => setWeight(e.target.value)}
+                      />
+                    </Grid>*/}
                 </Flex>
                 <Title name="מצב המוצר" />
                 <Swiper
@@ -1124,11 +1050,11 @@ const date = new Date(start);
                     <>
                       <Title name="תמחור" />
                       {/*<Grid
-                        gridTemplateColumns="1fr 1fr"
-                        gap="4"
-                        pb={{ base: "20px", md: "35px" }}
-                        //alignItems="end"
-                  >*/}
+                          gridTemplateColumns="1fr 1fr"
+                          gap="4"
+                          pb={{ base: "20px", md: "35px" }}
+                          //alignItems="end"
+                    >*/}
                       <Input
                         light
                         required
@@ -1145,44 +1071,44 @@ const date = new Date(start);
                       {/* </Grid>*/}
 
                       {/* <Box pb="3">
-                        <FormControl display="flex" gap="3" alignItems="center">
-                          <Switch
-                            id=""
-                            size="lg"
-                            onChange={() => setDisable(!disable)}
+                          <FormControl display="flex" gap="3" alignItems="center">
+                            <Switch
+                              id=""
+                              size="lg"
+                              onChange={() => setDisable(!disable)}
+                            />
+                            <FormLabel
+                              mb="0"
+                              letterSpacing="0.005em"
+                              lineHeight="18px"
+                              fontSize={{ base: "14px", md: "16px" }}
+                              fontWeight={{ base: "normal", md: "medium" }}
+                            >
+                              אפשר הצעות
+                            </FormLabel>
+                          </FormControl>
+                  </Box>
+  
+                        <Grid
+                          gridTemplateColumns="1fr 1fr"
+                          gap="4"
+                          alignItems="end"
+                        >
+                          <Input
+                            light
+                            label="מחיר מינימלי"
+                            disabled={disable}
+                            value={minPrice}
+                            onChange={(e) => setMinPrice(e.target.value)}
                           />
-                          <FormLabel
-                            mb="0"
-                            letterSpacing="0.005em"
-                            lineHeight="18px"
-                            fontSize={{ base: "14px", md: "16px" }}
-                            fontWeight={{ base: "normal", md: "medium" }}
-                          >
-                            אפשר הצעות
-                          </FormLabel>
-                        </FormControl>
-                </Box>
-
-                      <Grid
-                        gridTemplateColumns="1fr 1fr"
-                        gap="4"
-                        alignItems="end"
-                      >
-                        <Input
-                          light
-                          label="מחיר מינימלי"
-                          disabled={disable}
-                          value={minPrice}
-                          onChange={(e) => setMinPrice(e.target.value)}
-                        />
-                        <Input
-                          light
-                          label="מחיר מקסימלי"
-                          disabled={disable}
-                          value={maxPrice}
-                          onChange={(e) => setMaxPrice(e.target.value)}
-                        />
-                </Grid>*/}
+                          <Input
+                            light
+                            label="מחיר מקסימלי"
+                            disabled={disable}
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(e.target.value)}
+                          />
+                  </Grid>*/}
 
                       <Title name="זמן פתיחה" />
                       <Flex
@@ -1222,94 +1148,103 @@ const date = new Date(start);
                           התחל מיידית
                         </Button>
                         <Popover closeOnBlur={false}>
-                        {({ onClose }) => (
-                          <>
-                          <PopoverTrigger>
-                            <Button
-                              h={{ base: "50px", md: "40px" }}
-                              w={{
-                                base: "154px",
-                                sm: "220px",
-                                md: "-webkit-fit-content",
-                              }}
-                              variant="outline"
-                              borderColor={{
-                                base:
-                                  time === 2 ? "primaryLight" : "transparent",
-                                md: time === 2 ? "primary" : "bright",
-                              }}
-                              fontWeight="normal"
-                              _hover={time !== 2 && { bg: "bright" }}
-                              color={{
-                                base: time === 2 ? "primary" : "naturalDarkest",
-                                md: time === 2 ? "white" : "naturalDarkest",
-                              }}
-                              bgColor={{
-                                base:
-                                  time === 2 ? "primaryLightest" : "inputBg",
-                                md: time === 2 ? "primary" : "white",
-                              }}
-                              borderRadius={{ base: "12px", md: "10px" }}
-                              onClick={() => {
-                                setTime(2);
-                              }}
-                            >
-                              קבע תאריך ושעה
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent>
-                            <PopoverArrow />
-                            <PopoverCloseButton/>
-                            <PopoverHeader>קבע תאריך ושעה</PopoverHeader>
-                            <PopoverBody>
-                              <Flex
-                                flexDir="column"
-                                justifyContent="center"
-                                alignItems="center"
-                                gap="3"
-                              >
-                                <DatePicker
-                                  selected={selectedDate}
-                                  onChange={setSelectedDate}
-                                  dateFormat="dd/MM/yyyy"
-                                  placeholderText="בחר תאריך"
-                                  className="date-picker"
-                                  minDate={new Date()}
-                                />
-                                <DatePicker
-                                  selected={selectedTime}
-                                  onChange={setSelectedTime}
-                                  showTimeSelect
-                                  showTimeSelectOnly
-                                  timeIntervals={15}
-                                  timeCaption="זמן"
-                                  dateFormat="HH:mm"
-                                  placeholderText="בחר שעה"
-                                  className="time-picker"
-                                />
+                          {({ onClose }) => (
+                            <>
+                              <PopoverTrigger>
                                 <Button
-                                  alignItems="center"
-                                  justifyContent="center"
-                                  h="35px"
-                                  w={{ base: "70px", md: "80px" }}
-                                  fontSize={{ base: "14px", md: "16px" }}
+                                  h={{ base: "50px", md: "40px" }}
+                                  w={{
+                                    base: "154px",
+                                    sm: "220px",
+                                    md: "-webkit-fit-content",
+                                  }}
+                                  variant="outline"
+                                  borderColor={{
+                                    base:
+                                      time === 2
+                                        ? "primaryLight"
+                                        : "transparent",
+                                    md: time === 2 ? "primary" : "bright",
+                                  }}
                                   fontWeight="normal"
-                                  _hover={{ bg: "primaryHover" }}
-                                  color="white"
-                                  bgColor="primary"
+                                  _hover={time !== 2 && { bg: "bright" }}
+                                  color={{
+                                    base:
+                                      time === 2 ? "primary" : "naturalDarkest",
+                                    md: time === 2 ? "white" : "naturalDarkest",
+                                  }}
+                                  bgColor={{
+                                    base:
+                                      time === 2
+                                        ? "primaryLightest"
+                                        : "inputBg",
+                                    md: time === 2 ? "primary" : "white",
+                                  }}
                                   borderRadius={{ base: "12px", md: "10px" }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDateTimeSubmit();
-                                    onClose();
+                                  onClick={() => {
+                                    setTime(2);
                                   }}
                                 >
-                                  אישור
+                                  קבע תאריך ושעה
                                 </Button>
-                              </Flex>
-                            </PopoverBody>
-                          </PopoverContent>
-                          </>)}
+                              </PopoverTrigger>
+                              <PopoverContent>
+                                <PopoverArrow />
+                                <PopoverCloseButton />
+                                <PopoverHeader>קבע תאריך ושעה</PopoverHeader>
+                                <PopoverBody>
+                                  <Flex
+                                    flexDir="column"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    gap="3"
+                                  >
+                                    <DatePicker
+                                      selected={selectedDate}
+                                      onChange={setSelectedDate}
+                                      dateFormat="dd/MM/yyyy"
+                                      placeholderText="בחר תאריך"
+                                      className="date-picker"
+                                      minDate={new Date()}
+                                    />
+                                    <DatePicker
+                                      selected={selectedTime}
+                                      onChange={setSelectedTime}
+                                      showTimeSelect
+                                      showTimeSelectOnly
+                                      timeIntervals={15}
+                                      timeCaption="זמן"
+                                      dateFormat="HH:mm"
+                                      placeholderText="בחר שעה"
+                                      className="time-picker"
+                                    />
+                                    <Button
+                                      alignItems="center"
+                                      justifyContent="center"
+                                      h="35px"
+                                      w={{ base: "70px", md: "80px" }}
+                                      fontSize={{ base: "14px", md: "16px" }}
+                                      fontWeight="normal"
+                                      _hover={{ bg: "primaryHover" }}
+                                      color="white"
+                                      bgColor="primary"
+                                      borderRadius={{
+                                        base: "12px",
+                                        md: "10px",
+                                      }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDateTimeSubmit();
+                                        onClose();
+                                      }}
+                                    >
+                                      אישור
+                                    </Button>
+                                  </Flex>
+                                </PopoverBody>
+                              </PopoverContent>
+                            </>
+                          )}
                         </Popover>
                       </Flex>
 
@@ -1371,10 +1306,10 @@ const date = new Date(start);
                             fontWeight="normal"
                             _hover={timeFrame !== 4 && { bg: "bright" }}
                             /* _hover={
-                              timeFrame === 4
-                                ? { color: "primaryLight" }
-                                : { bg: "bright" }
-                            }*/
+                                timeFrame === 4
+                                  ? { color: "primaryLight" }
+                                  : { bg: "bright" }
+                              }*/
                             color={{
                               base:
                                 timeFrame === 4 ? "primary" : "naturalDarkest",
@@ -1470,13 +1405,13 @@ const date = new Date(start);
                             }}
                             fontWeight="normal"
                             /*  _hover={
-                              timeFrame === 30
-                                ? {
-                                    base: { color: "primaryLight" },
-                                    md: { color: "white", bg: "primaryDark" },
-                                  }
-                                : { bg: "bright" }
-                            }*/
+                                timeFrame === 30
+                                  ? {
+                                      base: { color: "primaryLight" },
+                                      md: { color: "white", bg: "primaryDark" },
+                                    }
+                                  : { bg: "bright" }
+                              }*/
                             _hover={timeFrame !== 30 && { bg: "bright" }}
                             color={{
                               base:
@@ -1598,9 +1533,9 @@ const date = new Date(start);
                           if (pictures.length === 6) {
                             break; // יוצא מהלולאה אם הגענו ל-6 תמונות
                           }
-                          const base64 = await blobToBase64(file);
                           p.push({
-                            image: base64,
+                            image: file,
+                            url: URL.createObjectURL(file),
                             name: file.name,
                             size: file.size,
                           });
@@ -1631,9 +1566,9 @@ const date = new Date(start);
                           if (pictures.length === 6) {
                             break;
                           }
-                          const base64 = await blobToBase64(file);
                           p.push({
-                            image: base64,
+                            image: file,
+                            url: URL.createObjectURL(file),
                             name: file.name,
                             size: file.size,
                           });
@@ -1675,7 +1610,7 @@ const date = new Date(start);
                             icon={<CloseIcon />}
                             onClick={() =>
                               setPictures(
-                                pictures.filter((p) => p.url !== image.url)
+                                pictures.filter((p) => p !== image)
                               )
                             }
                           />
@@ -1685,16 +1620,16 @@ const date = new Date(start);
                             alignItems="center"
                           >
                             <Flex dir="ltr" flexDir="column">
-                              <Text fontSize="16px">{image.name}</Text>
-                              <Text
+                              <Text fontSize="16px">{image.name || index + 1}</Text>
+                              {image.size && <Text
                                 fontWeight="light"
                                 fontSize="12px"
                                 lineHeight="16px"
                               >
                                 {Math.ceil(image.size / 1000)}Kb
-                              </Text>
+                              </Text>}
                             </Flex>
-                            {image.name.split(".")[1] === "png" ? (
+                            {image.name && image.name.split(".")[1] === "png" ? (
                               <Image
                                 h="28px"
                                 alt="an icon of png file"
@@ -1747,33 +1682,18 @@ const date = new Date(start);
                     select={(picture) => setMainPicture(picture)}
                   />
                 </Box>
+                <Flex alignItems="center" gap="4">
+                  <Bbutton
+                    w={{ base: "232px", sm: "360px", md: "184px" }}
+                    h={{ base: "60px", md: "64px" }}
+                    bg={{ base: "primaryLight", md: "primary" }}
+                    borderRadius={{ base: "14px", md: "12px" }}
+                    onClick={() => update()}
+                  >
+                    עדכן מוצר
+                  </Bbutton>
 
-                <Flex justifyContent="space-between" alignItems="center">
-                  <Flex alignItems="center" gap="4">
-                    <Bbutton
-                      w={{ base: "232px", sm: "360px", md: "184px" }}
-                      h={{ base: "60px", md: "64px" }}
-                      bg={{ base: "primaryLight", md: "primary" }}
-                      borderRadius={{ base: "14px", md: "12px" }}
-                      onClick={() => createProduct()}
-                    >
-                      הפעל מכירה
-                    </Bbutton>
-                    <Bbutton.Secondary
-                      color="primary"
-                      bg="white"
-                      borderColor="primary"
-                      border="2px solid"
-                      display={{ base: "none", md: "block" }}
-                      borderRadius={{ base: "14px", md: "12px" }}
-                      w="278px"
-                      h={{ base: "60px", md: "64px" }}
-                      fontSize="20px"
-                    >
-                      שמור למועד מאוחר יותר
-                    </Bbutton.Secondary>
-                  </Flex>
-                  <IconButton
+      {/*<IconButton
                     w={{ base: "60px", md: "64px" }}
                     h={{ base: "60px", md: "64px" }}
                     bg={{ base: "primaryLightest", md: "naturalLightest" }}
@@ -1781,7 +1701,7 @@ const date = new Date(start);
                     borderRadius="14px"
                     icon={<TrashIcon fill="#0738D2" />}
                     onClick={openDelete}
-                  />
+                />*/}
                 </Flex>
               </Box>
             </Box>
@@ -1837,7 +1757,7 @@ const date = new Date(start);
             </ModalContent>
           </Modal>
 
-          <Modal isOpen={isOpenLogin} onClose={closeLogin}>
+          {/*<Modal isOpen={isOpenLogin} onClose={closeLogin}>
             <ModalOverlay />
             <ModalContent
               dir="rtl"
@@ -1907,7 +1827,7 @@ const date = new Date(start);
                 </Flex>
               </ModalBody>
             </ModalContent>
-          </Modal>
+                </Modal>*/}
 
           <Modal isOpen={isOpenDelete} onClose={closeDelete}>
             <ModalOverlay />

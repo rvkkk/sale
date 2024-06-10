@@ -135,10 +135,11 @@ export default function CartItemGallery(props) {
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
           display={{ base: "none", md: "block" }}
-          onClick={() =>
-            (window.location.href = product.openingPrice
-              ? routes.ProductPageAuction.path.replace(":id", "") + product._id
-              : routes.ProductPage.path.replace(":id", "") + product._id)
+          onClick={() => 
+              window.location.href = product.openingPrice
+                ? routes.ProductPageAuction.path.replace(":id", "") +
+                  product._id
+                : routes.ProductPage.path.replace(":id", "") + product._id
           }
         >
           <Image
@@ -150,22 +151,43 @@ export default function CartItemGallery(props) {
           />
           <Box px="2">
             {product.openingPrice && (
-              <Box pb="6">
+              <Box>
                 <Flex justifyContent="center" transform="translateY(-50%)">
                   <ProductTimeClock
                     date={product.startTime}
                     frame={product.timeFrame}
                   />
                 </Flex>
+                <Spacer h="1px" />
               </Box>
             )}
-            <Spacer h="10" />
-            <Text fontSize="20px" letterSpacing="-0.01em" lineHeight="24px">
-              {product.title}
-            </Text>
-            <Spacer h="6" />
+            {!product.openingPrice && <Spacer h="10" />}
+            <Flex flexDir="column" gap="2">
+              <Text fontSize="24px" letterSpacing="-0.01em" lineHeight="24px">
+                {product.title}
+              </Text>
+              {props.myItem &&
+                (product.openingPrice ? (
+                  <Text
+                    fontSize="18px"
+                    letterSpacing="-0.01em"
+                    lineHeight="24px"
+                  >
+                    {product.offers.length} הצעות
+                  </Text>
+                ) : (
+                  <Text
+                    fontSize="18px"
+                    letterSpacing="-0.01em"
+                    lineHeight="24px"
+                  >
+                    {product.numOfBuy} הזמנות
+                  </Text>
+                ))}
+            </Flex>
+            <Spacer h="4" />
             <Flex gap="8" alignItems="center">
-              {product.currentPrice ? (
+              {product.openingPrice ? (
                 <>
                   {product.winningPrice === 0 ? (
                     <Box flex="1">
@@ -177,7 +199,7 @@ export default function CartItemGallery(props) {
                         fontSize="24px"
                         lineHeight="30px"
                       >
-                        ₪ {removeDecimal(product.currentPrice)}
+                        {removeDecimal(product.currentPrice)} ₪
                       </Text>
                     </Box>
                   ) : (
@@ -186,12 +208,11 @@ export default function CartItemGallery(props) {
                         נמכר
                       </Text>
                       <Text
-                        dir="rtl"
                         fontWeight="medium"
                         fontSize="24px"
                         lineHeight="30px"
                       >
-                        ₪ {product.winningPrice}
+                        {product.winningPrice} ₪
                       </Text>
                     </Box>
                   )}
@@ -202,10 +223,7 @@ export default function CartItemGallery(props) {
                     מחיר
                   </Text>
                   <Text fontWeight="medium" fontSize="24px" lineHeight="30px">
-                    ₪{product.price}
-                    {/*removeDecimal(
-                    (product.price * (100 - product.discount)) / 100
-                  )*/}
+                    {removeDecimal(product.price)} ₪
                   </Text>
                 </Box>
               )}
@@ -277,21 +295,41 @@ export default function CartItemGallery(props) {
                         h="60px"
                         fontSize="18px"
                         lineHeight="20px"
-                        onClick={() =>
-                          (window.location.href = product.openingPrice
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = product.openingPrice
                             ? routes.ProductPageAuction.path.replace(
                                 ":id",
                                 ""
                               ) + product._id
                             : routes.ProductPage.path.replace(":id", "") +
-                              product._id)
-                        }
+                              product._id;
+                        }}
                       >
                         קנו עכשיו
                       </Button>
                     </Box>
                   )}
                 </>
+              )}
+              {props.myItem && (
+                <Box position="relative">
+                  <Button
+                    w="126px"
+                    h="60px"
+                    fontSize="18px"
+                    lineHeight="20px"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.location.href = routes.UpdateProduct.path.replace(
+                        ":id",
+                        product._id
+                      );
+                    }}
+                  >
+                    עדכן מוצר
+                  </Button>
+                </Box>
               )}
             </Flex>
           </Box>
@@ -306,7 +344,7 @@ export default function CartItemGallery(props) {
               justifyContent="space-between"
               px="6"
             >
-              {product.offers ? (
+              {product.offers && !props.myItem ? (
                 <Badge>
                   {product.offers ? product.offers.length : 0} הצעות
                 </Badge>
@@ -494,13 +532,14 @@ export default function CartItemGallery(props) {
                       borderRadius="8px"
                       fontSize="16px"
                       lineHeight="26px"
-                      onClick={() =>
-                        (window.location.href = product.openingPrice
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href = product.openingPrice
                           ? routes.ProductPageAuction.path.replace(":id", "") +
                             product._id
                           : routes.ProductPage.path.replace(":id", "") +
-                            product._id)
-                      }
+                            product._id;
+                      }}
                     >
                       קנו עכשיו
                     </Button>

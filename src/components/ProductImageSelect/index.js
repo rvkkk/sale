@@ -130,7 +130,7 @@ const ImageSelect = ({ checked = false, image, choose, margin }) => {
           base: checked && image && "primaryLight",
           md: "transparent",
         }}
-        src={image ? image.url : process.env.PUBLIC_URL + "/assets/Image.png"}
+        src={image ? (image.url || image.image || image) : process.env.PUBLIC_URL + "/assets/Image.png"}
       />
     </Box>
   );

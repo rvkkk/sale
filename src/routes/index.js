@@ -3,6 +3,7 @@ import Category from "../pages/Category";
 import CheckOut from "../pages/CheckOut";
 import ContactUs from "../pages/ContactUs";
 import CreateProduct from "../pages/CreateProduct";
+import UpdateProduct from "../pages/UpdateProduct";
 import FAQ from "../pages/FAQ";
 import About from "../pages/About";
 import Article from "../pages/Article";
@@ -76,8 +77,12 @@ export const routes = {
         component: ProductPageAuction
     },
     CreateProduct: {
-        path: "/product/create",
+        path: "/create-product",
         component: CreateProduct
+    },
+    UpdateProduct: {
+        path: "/update-product/:id",
+        component: UpdateProduct
     },
     FAQ: {
         path: "/faq",
