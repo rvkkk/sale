@@ -8,7 +8,7 @@ import Button from "../Button";
 export default function TopProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(2);
   const [totalPages, setTotalPages] = useState(1);
   const componentRef = useRef(null);
   const [allowLoadMore, setAllowLoadMore] = useState(true);
@@ -23,10 +23,9 @@ export default function TopProducts() {
   const itemsPerPage = itemsPerRow * 2;
 
   useEffect(() => {
-    getProducts(page, itemsPerPage)
+    getProducts(1, itemsPerPage)
       .then((res) => {
-        console.log(res);
-        setPage(page + 1);
+        console.log(res, 1);
         setProducts(res.products);
       })
       .catch((err) => console.log(err));
@@ -36,6 +35,7 @@ export default function TopProducts() {
     setLoading(true);
     getProducts(page, itemsPerPage)
       .then((res) => {
+        console.log(res, page);
         setPage(page + 1);
         setProducts((prevProducts) => [
           ...prevProducts,

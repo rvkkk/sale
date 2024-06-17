@@ -26,8 +26,10 @@ export default function ProductTimeClock(props) {
         display={{ base: "none", md: "flex" }}
       >
         <ClockBigIcon />
-        <Text fontSize="30px" lineHeight="42px" color="primary" pt="1">
-          {`${timeLeft.hours < 10 ? "0" + timeLeft.hours : timeLeft.hours}h : ${
+        <Text fontSize="24px" lineHeight="42px" color="primary">
+          {`${timeLeft.days < 10 ? "0" + timeLeft.days : timeLeft.days}d : ${
+            timeLeft.hours < 10 ? "0" + timeLeft.hours : timeLeft.hours
+          }h : ${
             timeLeft.minutes < 10 ? "0" + timeLeft.minutes : timeLeft.minutes
           }m : ${
             timeLeft.seconds < 10 ? "0" + timeLeft.seconds : timeLeft.seconds
@@ -38,7 +40,7 @@ export default function ProductTimeClock(props) {
         alignItems="center"
         gap="10px"
         display={{ base: "flex", md: "none" }}
-        w="144px"
+        //w="144px"
         h="35px"
         bg="rgba(255, 255, 255, 0.2)"
         borderRadius="30px"
@@ -51,7 +53,9 @@ export default function ProductTimeClock(props) {
           letterSpacing="0.02em"
           color="naturalWhite"
         >
-          {`${timeLeft.hours < 10 ? "0" + timeLeft.hours : timeLeft.hours}h : ${
+          {`${timeLeft.days < 10 ? "0" + timeLeft.days : timeLeft.days}d :${
+            timeLeft.hours < 10 ? "0" + timeLeft.hours : timeLeft.hours
+          }h : ${
             timeLeft.minutes < 10 ? "0" + timeLeft.minutes : timeLeft.minutes
           }m : ${
             timeLeft.seconds < 10 ? "0" + timeLeft.seconds : timeLeft.seconds
@@ -80,7 +84,8 @@ export default function ProductTimeClock(props) {
               COMING SOON
             </Text>
           </Flex>
-        ) : timeLeft.hours === 0 &&
+        ) : timeLeft.days === 0 &&
+          timeLeft.hours === 0 &&
           timeLeft.minutes === 0 &&
           timeLeft.seconds === 0 ? (
           <Flex justifyContent="center" alignItems="center" w="max">
@@ -97,14 +102,16 @@ export default function ProductTimeClock(props) {
           <Flex justifyContent="end" alignItems="center" gap="2" w="max">
             {/*<BiAlarm color="naturalDarkest" fontSize="18px" />*/}
             <ClockIcon />
-            {timeLeft.hours === 0 && timeLeft.minutes === 0 ? (
+            {timeLeft.days === 0 &&
+            timeLeft.hours === 0 &&
+            timeLeft.minutes === 0 ? (
               <Text
                 color="otherError"
                 fontWeight="light"
                 fontSize="18px"
                 letterSpacing="0.02em"
               >
-                {`00h : 00m : ${
+                {`00d : 00h : 00m : ${
                   timeLeft.seconds < 10
                     ? "0" + timeLeft.seconds
                     : timeLeft.seconds
@@ -118,6 +125,8 @@ export default function ProductTimeClock(props) {
                 letterSpacing="0.02em"
               >
                 {`${
+                  timeLeft.days < 10 ? "0" + timeLeft.days : timeLeft.days
+                }d :${
                   timeLeft.hours < 10 ? "0" + timeLeft.hours : timeLeft.hours
                 }h : ${
                   timeLeft.minutes < 10
@@ -156,7 +165,8 @@ export default function ProductTimeClock(props) {
               COMING SOON
             </Text>
           </Flex>
-        ) : timeLeft.hours === 0 &&
+        ) : timeLeft.days === 0 &&
+          timeLeft.hours === 0 &&
           timeLeft.minutes === 0 &&
           timeLeft.seconds === 0 ? (
           <Flex justifyContent="center" alignItems="center" w="max">
@@ -172,14 +182,16 @@ export default function ProductTimeClock(props) {
         ) : (
           <Flex justifyContent="center" alignItems="center" gap="2" w="max">
             <ClockSmallIcon />
-            {timeLeft.hours === 0 && timeLeft.minutes === 0 ? (
+            {timeLeft.days === 0 &&
+            timeLeft.hours === 0 &&
+            timeLeft.minutes === 0 ? (
               <Text
                 color="otherError"
                 fontWeight="light"
                 fontSize="14px"
                 letterSpacing="0.02em"
               >
-                {`00h : 00m : ${
+                {`00d : 00h : 00m : ${
                   timeLeft.seconds < 10
                     ? "0" + timeLeft.seconds
                     : timeLeft.seconds
@@ -194,6 +206,8 @@ export default function ProductTimeClock(props) {
                 letterSpacing="0.02em"
               >
                 {`${
+                  timeLeft.days < 10 ? "0" + timeLeft.days : timeLeft.days
+                }d : ${
                   timeLeft.hours < 10 ? "0" + timeLeft.hours : timeLeft.hours
                 }h : ${
                   timeLeft.minutes < 10

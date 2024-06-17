@@ -110,8 +110,8 @@ export default function Products({
             height="40px"
             icon={<ChevronLeftIcon />}
             onClick={() => {
-              if (swiperRef.current) {
-                swiperRef.current.swiper.navigation.nextEl.click();
+              if (swiperRef.current && swiperRef.current.swiper) {
+                swiperRef.current.swiper.slideNext();
                 activeIndex < products.length - numberOfSlides &&
                   setActiveIndex(activeIndex + 1);
               }
@@ -133,8 +133,8 @@ export default function Products({
             height="40px"
             icon={<ChevronRightIcon />}
             onClick={() => {
-              if (swiperRef.current) {
-                swiperRef.current.swiper.navigation.prevEl.click();
+              if (swiperRef.current && swiperRef.current.swiper) {
+                swiperRef.current.swiper.slidePrev();
                 activeIndex >= 1 && setActiveIndex(activeIndex - 1);
               }
             }}

@@ -54,35 +54,48 @@ import {
   StarFullIcon,
   HeartMobileIcon,
   HeartFullMobileIcon,
+  FlagIcon,
 } from "../components/Icons";
 import ProductTimeClock from "../components/ProductTimeClock";
 import ProductAccordings from "../components/ProductAccordings";
+import TopProducts from "../components/LoadingProducts";
 
 export default function ProductPageAuction() {
+  const [product, setProduct] = useState({});
+  const [didAddedToCart, setDidAddedToCart] = useState(false);
+  const [amountToBuy, setAmountToBuy] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [additionalInfo, setAdditionalInfo] = useState([]);
+  // const [size, setSize] = useState("S");
+  //const [model, setModel] = useState("1");
+  const [inWishList, setInWishList] = useState(false);
+  const [showFullText, setShowFullText] = useState(false);
+  const token = window.localStorage.getItem("token");
+  const [isTextShort, setIsTextShort] = useState(true);
+  const [change, setChange] = useState("");
+  const [number, setNumber] = useState(1);
+  const [price, setPrice] = useState(0);
+
+  
   const tabs = [
-    { name: "פרטים טכניים", component: <Tab1Component /> },
+    {
+      name: "מידע נוסף",
+      component: <Tab1Component additionalInfo={additionalInfo} />,
+    },
     { name: "המלצות", component: <Tab2Component /> },
-    { name: "משלוחים והחזרות", component: <Tab3Component /> },
+    {
+      name: "משלוחים והחזרות",
+      component: <Tab3Component shippingCost={product["shipping-cost"]} deliveryTime={product["delivery-time"]}/>,
+    },
   ];
 
-  const [product, setProduct] = useState(null);
-  const [productsInCategory, setProductsInCategory] = useState([]);
-  const [mostByProducts, setMostByProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [price, setPrice] = useState("");
-  const [inWishList, setInWishList] = useState(false);
-  const token = window.localStorage.getItem("token");
-
   useEffect(() => {
-    if (product === null) {
       setLoading(true);
       getAuctionProduct(window.location.href.split("/").pop().split("?")[0])
         .then((res) => {
           setProduct(res.product);
-          setProductsInCategory(
-            sortProductsByCategory(res.product.products, res.product.category)
-          );
-          setMostByProducts(sortMostBuyProducts(res.product.products));
+          setPrice(product.currentPrice ? product.currentPrice : product.openingPrice)
+          console.log(res)
           setLoading(false);
         })
         .catch((err) => {
@@ -91,7 +104,6 @@ export default function ProductPageAuction() {
           alert("מוצר לא נמצא");
           window.location.href = routes.HOME.path;
         });
-    }
   }, []);
 
   const addWish = () => {
@@ -156,12 +168,61 @@ export default function ProductPageAuction() {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const breadcrumb = [
+  const breadcrumb = product.title && [
     { name: "דף הבית", href: routes.HOME.path },
-    { name: "קטגוריה", href: routes.Category.path },
-    { name: "מחלקה", href: routes.Category.path + product.category },
-    { name: "מוצר", href: routes.ProductPage.path + product.id },
+    {
+      name: product.mainCategory.name,
+      href: routes.Categories.path.replace(
+        ":category",
+        product.mainCategory.title
+      ),
+    },
+    {
+      name: product.category.name,
+      href: routes.Category.path
+        .replace(":main-category", product.mainCategory.title)
+        .replace(":category", product.category.title),
+    },
+    { name: product.title, href: "#" },
   ];
+
+
+  useEffect(() => {
+    if (product.title)
+    {
+    const array = [
+      {
+        title: "מידע נוסף",
+        "english-title": "additional information",
+        desc: product["additional-information"],
+      },
+      {
+        title: "מאפיינים",
+        "english-title": "properties",
+        desc: product.properties,
+      },
+      { title: "הערות", "english-title": "notes", desc: product.notes },
+      {
+        title: "הערכה כוללת",
+        "english-title": "the kit includes",
+        desc: product["kit-include"],
+      },
+      {
+        title: "שם הדגם",
+        "english-title": "model name",
+        desc: product["model-name"],
+      },
+      {
+        title: "מפרט",
+        "english-title": "specification",
+        desc: product.specification,
+      },
+    ];
+    for (const field of product["additional-fields"]) array.push(field);
+    setAdditionalInfo(array);
+  }
+  }, [product]);
+
 
   return (
     <Layout breadcrumb={breadcrumb}>
@@ -179,17 +240,16 @@ export default function ProductPageAuction() {
                 display={{ base: "none", md: "block" }}
               >
                 <Container>
-                  <ProductBanner />
-
+                <ProductBanner sellerDetails={product["seller-details"]}/>
                   <Flex mt="10" gap={{ md: "5", lg: "10" }} mx="auto">
                     <Flex justifyContent="end" w="50%">
-                      {" "}
-                      <ImageGallery images={product.product.images} />
+                      <ImageGallery images={product.images} />
                     </Flex>
 
                     <Box w="50%">
                       <Box w="80%">
                         <Flex flexDir="column" gap="2">
+                        {product.status !== "לא רלוונטי" && (
                           <Flex
                             alignItems="center"
                             textAlign="center"
@@ -209,6 +269,7 @@ export default function ProductPageAuction() {
                               {product.status}
                             </Text>
                           </Flex>
+                           )}
                           {/*</Flex> <Text
                             fontWeight="medium"
                             fontSize="32px"
@@ -257,7 +318,7 @@ export default function ProductPageAuction() {
                             */}
                           <Text
                             fontWeight="medium"
-                            fontSize={{ md: "24px", lg: "32px" }}
+                            fontSize={{ md: "28px", lg: "32px" }}
                             lineHeight={{ md: "30px", lg: "35px" }}
                             color="naturalBlack"
                           >
@@ -297,14 +358,15 @@ export default function ProductPageAuction() {
                             />
                           </Flex>
                           <Text
-                            fontSize="16px"
+                            fontSize="18px"
                             lineHeight={{ md: "18px", lg: "26px" }}
                             color="naturalDarkest"
                           >
                             {product.description}
                           </Text>
-                          <Spacer h="16" />
+                          
                         </Flex>
+                        <Spacer h="6" />
                         <Box>
                           <Flex
                             justifyContent="space-between"
@@ -321,7 +383,7 @@ export default function ProductPageAuction() {
                                   lineHeight="26px"
                                   letterSpacing="-0.02em"
                                 >
-                                  {product.product.currentPrice} ₪
+                                  {product.currentPrice ? product.currentPrice : product.openingPrice} ₪
                                 </Text>
                               </Box>
                               <Divider bg="naturalLight" h="34px" w="1px" />
@@ -338,7 +400,7 @@ export default function ProductPageAuction() {
                                   lineHeight="26px"
                                   letterSpacing="-0.02em"
                                 >
-                                  {product.product.openingPrice} ₪
+                                  {product.openingPrice} ₪
                                 </Text>
                               </Box>
                             </Flex>
@@ -357,7 +419,7 @@ export default function ProductPageAuction() {
                                 <Image h="14px" src={process.env.PUBLIC_URL + "/assets/tool.png"} />
                                 <Text lineHeight="20px">הצעות</Text>
                                 <Text lineHeight="20px">
-                                  {product.product.offers}
+                                  {product.offers && product.offers.length}
                                 </Text>
                               </Flex>
                               <Flex
@@ -373,14 +435,14 @@ export default function ProductPageAuction() {
                                 <Image h="3" src={process.env.PUBLIC_URL + "/assets/eye.png"} />
                                 <Text lineHeight="20px">צופים</Text>
                                 <Text lineHeight="20px">
-                                  {product.product.viewed}
+                                  {product.viewed}
                                 </Text>
                               </Flex>
                             </Flex>
                           </Flex>
                           <Spacer h="8" />
                           <Card p="25px">
-                            <Flex gap="20" mb="4">
+                            <Flex gap="10" mb="3">
                               <Box>
                                 <Text
                                   fontSize="14px"
@@ -391,11 +453,11 @@ export default function ProductPageAuction() {
                                   הצעה אחרונה
                                 </Text>
                                 <Text
-                                  fontSize="30px"
+                                  fontSize="28px"
                                   lineHeight="42px"
                                   color="primary"
                                 >
-                                  ₪{product.product.currentPrice}{" "}
+                                 {product.currentPrice} ₪
                                 </Text>
                               </Box>
                               <Box>
@@ -407,7 +469,7 @@ export default function ProductPageAuction() {
                                 >
                                   מכירה מסתיימת בעוד
                                 </Text>
-                                <ProductTimeClock date={product.product.date} frame={product.product.timeFrame} showProduct />
+                                <ProductTimeClock date={product.startTime} frame={product.timeFrame} showProduct />
                               </Box>
                             </Flex>
 
@@ -424,15 +486,14 @@ export default function ProductPageAuction() {
                                 onChange={(e) => setPrice(e.target.value)}
                                 placeholder={
                                   "₪" +
-                                  product.product.currentPrice +
-                                  " או יותר"
+                                  (product.currentPrice ? product.currentPrice : product.openingPrice)
                                 }
                               />
                               <Button
                                 w="260px"
                                 h="60px"
                                 onClick={() =>
-                                  price >= product.product.currentPrice &&
+                                  price >= product.currentPrice &&
                                   onOpen()
                                 }
                               >
@@ -464,7 +525,7 @@ export default function ProductPageAuction() {
                               fontWeight="medium"
                               color="naturalBlack"
                             >
-                              משלוח תוך 4 ימים
+                              משלוח תוך {product["delivery-time"]} ימים
                             </Text>
 
                             <Text color="naturalLight">
@@ -545,7 +606,7 @@ export default function ProductPageAuction() {
                               נתקלתם בבעיה עם מוצר זה?
                             </Text>
                             <Flex gap="1" w="max" alignItems="center">
-                              <Image src={process.env.PUBLIC_URL + "/assets/flag.png"} />
+                            <FlagIcon />
                               <Link
                                 fontSize="14px"
                                 lineHeight="22px"
@@ -570,16 +631,9 @@ export default function ProductPageAuction() {
                   >
                     <Products
                       title="מוצרים דומים"
-                      products={productsInCategory.slice(0, 25)}
+                      category={product.Category && product.category.title}
                     />
-                    <Products
-                      title="מוצרים מובילים"
-                      w="298px"
-                      h="406px"
-                      p="310px"
-                      numberOfSlides={5}
-                      products={mostByProducts.slice(0, 25)}
-                    />
+                    <TopProducts />
                   </Flex>
                 </Container>
               </Box>
@@ -598,7 +652,9 @@ export default function ProductPageAuction() {
                     borderRadius="20px"
                     src={product.images && product.images[0]}
                   />
-                  <Box display="block" r="10px" top="10px"><ProductTimeClock date={product.product.date} frame={product.product.timeFrame} showProduct /></Box>
+                  <Box display="block" r="10px" top="10px">
+                    <ProductTimeClock date={product.startTime} frame={product.timeFrame} showProduct />
+                    </Box>
                   <Flex dir="rtl" p="20px" borderBottomRadius="20px">
                     <Text
                       fontSize="17px"
@@ -612,7 +668,7 @@ export default function ProductPageAuction() {
                       lineHeight="18px"
                       color="naturalBlack"
                     >
-                      {product.product.currentPrice}
+                      {product.currentPrice}
                     </Text>
                   </Flex>
                   <Flex
@@ -638,7 +694,7 @@ export default function ProductPageAuction() {
                                 <Image h="14px" src={process.env.PUBLIC_URL + "/assets/tool.png"} />
                                 <Text lineHeight="20px">הצעות</Text>
                                 <Text lineHeight="20px">
-                                  {product.product.offers}
+                                  {product.offers && product.offers.length}
                                 </Text>
                               </Flex>
                               <Flex
@@ -654,7 +710,7 @@ export default function ProductPageAuction() {
                                 <Image h="3" src={process.env.PUBLIC_URL + "/assets/eye.png"} />
                                 <Text lineHeight="20px">צופים</Text>
                                 <Text lineHeight="20px">
-                                  {product.product.viewed}
+                                  {product.viewed}
                                 </Text>
                               </Flex>
                             </Flex>
@@ -709,7 +765,7 @@ export default function ProductPageAuction() {
                           fontWeight="medium"
                           color="naturalBlack"
                         >
-                          משלוח תוך 4 ימים
+                          משלוח תוך {product["delivery-time"]} ימים
                         </Text>
                         <Text color="naturalLight">
                           <AiFillExclamationCircle />
@@ -767,14 +823,7 @@ export default function ProductPageAuction() {
                       </Flex>
                     </Flex>
                     <ProductAccordings tabs={tabs} />
-                    <Products
-                      title="מוצרים דומים"
-                      w="298px"
-                      h="406px"
-                      p="310px"
-                      numberOfSlides={5}
-                      products={productsInCategory.slice(0, 25)}
-                    />{" "}
+                    <TopProducts/>
                   </Flex>
                 </Container>
               </Box>

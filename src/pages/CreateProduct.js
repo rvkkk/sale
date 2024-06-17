@@ -187,7 +187,7 @@ const date = new Date(start);
           deliveryTime,
           modelName,
           specification,
-          additionalFields,
+          additionalFields[0].title !== "" ? additionalFields : [],
           filesOnly,
           status,
           fragile
@@ -243,7 +243,7 @@ const date = new Date(start);
           deliveryTime,
           modelName,
           specification,
-          additionalFields,
+          additionalFields[0].title !== "" ? additionalFields : [],
           filesOnly,
           status,
           fragile
