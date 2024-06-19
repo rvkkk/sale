@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { Flex, Heading, Image, Text, Link, Box } from "@chakra-ui/react";
 import LoginLayout from "../components/AuthLayout";
 import Button from "../components/Button";
@@ -6,12 +6,16 @@ import Checkbox from "../components/CheckBox";
 import Input, { PasswordField } from "../components/Input";
 import SEOWrapper from "../components/SEO";
 import { routes } from "../routes";
-import { login } from "../utils/api/users";
+import { googleLogin, googlelogin, login } from "../utils/api/users";
 import { addProduct } from "../utils/api/products";
 import Loader from "../components/Loader";
 import { RightIcon2 } from "../components/Icons";
 import Layout from "../components/Layout";
 import Container from "../components/Container";
+import { LoginFromGoogle } from "../utils/api/users";
+import axios from "axios";
+import { useGoogleLogin } from "@react-oauth/google";
+const googleUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 export default function Login() {
   const savedInput = window.localStorage.getItem("input");
@@ -94,30 +98,28 @@ export default function Login() {
               window.localStorage.setItem("token", res.token);
               const p = window.localStorage.getItem("new product");
               if (p) {
-                if(!p.auction)
-                {
-                addProduct(
-                  p.name,
-                  p.barcode,
-                  p.price,
-                  p.priceBefore,
-                  p.warranty,
-                  p.subcategory,
-                  p.description,
-                  p.additionalInfo,
-                  p.properties,
-                  p.notes,
-                  p.kitInclude,
-                  p.quantity,
-                  p.deliveryTime,
-                  p.modelName,
-                  p.specification,
-                  p.additionalFields,
-                  p.pictures,
-                  p.status,
-                  p.fragile
-                )
-                  .then((res) => {
+                if (!p.auction) {
+                  addProduct(
+                    p.name,
+                    p.barcode,
+                    p.price,
+                    p.priceBefore,
+                    p.warranty,
+                    p.subcategory,
+                    p.description,
+                    p.additionalInfo,
+                    p.properties,
+                    p.notes,
+                    p.kitInclude,
+                    p.quantity,
+                    p.deliveryTime,
+                    p.modelName,
+                    p.specification,
+                    p.additionalFields,
+                    p.pictures,
+                    p.status,
+                    p.fragile
+                  ).then((res) => {
                     console.log(res);
                     if (res.status === "ok") {
                       setLoading(false);
@@ -126,10 +128,10 @@ export default function Login() {
                       setLoading(false);
                       alert("שגיאה ביצירת מכירה חדשה");
                     }
-                  })
-               // window.location.href = routes.CreateProduct.path;
-              }}
-              else window.location.href = routes.HOME.path;
+                  });
+                  // window.location.href = routes.CreateProduct.path;
+                }
+              } else window.location.href = routes.HOME.path;
             } else {
               setLoading(false);
               setError("שם משתמש או סיסמה שגויים");
@@ -144,8 +146,37 @@ export default function Login() {
     }
   };
 
+  const LoginFromGoogle = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const { data } = await axios.get(googleUrl, {
+          headers: {
+            Authorization: `Bearer ${response.access_token}`,
+          },
+        });
+        console.log(data);
+        if (data.email_verified) 
+          googleLogin(data.email).then((res) => {
+          if (res.status === "ok") {
+            window.localStorage.setItem("token", res.token);
+            const p = window.localStorage.getItem("new product");
+            if (p) window.location.href = routes.CreateProduct.path;
+            else window.location.href = routes.HOME.path;
+          } else {
+            setLoading(false);
+          }
+        })
+        else setError("קרתה תקלה, אנא נסה שוב במועד מאוחר יותר");
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    onFailure: (response) =>
+      setError("קרתה תקלה, אנא נסה שוב במועד מאוחר יותר"),
+  });
+
   return (
-    <>
+    <Suspense fallback={<Loader />}>
       {loading ? (
         <Loader />
       ) : (
@@ -213,9 +244,12 @@ export default function Login() {
                   <Button h="64px" onClick={() => handleLogin()}>
                     התחבר
                   </Button>
-                  <Button.Secondary h="48px">
+                  <Button.Secondary h="48px" onClick={LoginFromGoogle}>
                     <span fontSize="14px">Sign in with Google</span>
-                    <Image width="25px" src={process.env.PUBLIC_URL + "/assets/Google.svg"} />
+                    <Image
+                      width="25px"
+                      src={process.env.PUBLIC_URL + "/assets/Google.svg"}
+                    />
                   </Button.Secondary>
                 </Flex>
 
@@ -358,11 +392,18 @@ export default function Login() {
                           color="#23263B"
                           bg="#F3F5F6"
                           border="none"
+                          onClick={LoginFromGoogle}
                         >
-                          <Text fontSize="18px" fontWeight="medium">
+                          <Text                         
+                            fontSize="18px"
+                            fontWeight="medium"
+                          >
                             Sign in with Google
                           </Text>
-                          <Image width="30px" src={process.env.PUBLIC_URL + "/assets/Google.svg"} />
+                          <Image
+                            width="30px"
+                            src={process.env.PUBLIC_URL + "/assets/Google.svg"}
+                          />
                         </Button.Secondary>
                       </Flex>
                     </Box>
@@ -387,6 +428,6 @@ export default function Login() {
           </Flex>
         </>
       )}
-    </>
+     </Suspense>
   );
 }

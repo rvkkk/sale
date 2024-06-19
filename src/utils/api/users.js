@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const baseURL = "http://localhost:3001/";
 //const baseURL = "https://sale-bid.df.r.appspot.com/";
@@ -7,6 +8,7 @@ const headers = {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 };
+const googleUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 const onTokenBroken = () => {
   localStorage.removeItem("token");
@@ -87,7 +89,6 @@ export const updatePasswordByEmail = (email, newPassword) => {
 };
 
 export const signup = (
-  //ID,
   email,
   firstName,
   lastName,
@@ -104,7 +105,6 @@ export const signup = (
   return new Promise((resolve, reject) => {
     axios
       .post(`${baseURL}create-user`, {
-        ID: 82468,
         email,
         firstName,
         lastName,
@@ -158,7 +158,6 @@ export const getUserProfile = () => {
 };
 
 export const updateUser = (
-  //ID,
   email,
   firstName,
   lastName,
@@ -177,7 +176,6 @@ export const updateUser = (
       .patch(
         `${baseURL}update-user`,
         {
-          ID: 82468,
           email,
           firstName,
           lastName,
@@ -247,6 +245,54 @@ export const deleteUser = () => {
       })
       .catch((err) => {
         //onTokenBroken();
+        reject(err);
+      });
+  });
+};
+
+export const googleLogin = (email) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .patch(`${baseURL}google-login`, {
+        email,
+      })
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        onTokenBroken();
+        reject(err);
+      });
+  });
+};
+
+
+export const googleSignin = (
+  email,
+  firstName,
+  lastName,
+  userName,
+  password,
+  profileImage
+) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`${baseURL}create-user`, {
+        email,
+        firstName,
+        lastName,
+        userName,
+        password,
+        profileImage
+      })
+      .then((res) => {
+        console.log(res)
+        resolve(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        if(err.response.data.error === "user already exists")
+          resolve("user already exists")
         reject(err);
       });
   });
