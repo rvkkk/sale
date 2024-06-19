@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
 
-const baseURL = "http://localhost:3001/";
-//const baseURL = "https://sale-bid.df.r.appspot.com/";
+//const baseURL = "http://localhost:3001/";
+const baseURL = "https://sale-bid.df.r.appspot.com/";
 const headers = {
   headers: {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
