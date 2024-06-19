@@ -73,8 +73,8 @@ export default function Footer() {
   const link2 = [
     { name: "אודות", path: routes.About.path },
     { name: "צור קשר", path: routes.ContactUs.path },
+    { name: "מאמרים", path: routes.FAQ.path },
     { name: "תקנון האתר", path: routes.Regulations.path },
-    { name: "מעקב הזמנות", path: "" },
   ];
 
   const createNewMailingList = () => {
@@ -162,7 +162,7 @@ export default function Footer() {
           </Flex>
         </Flex>
         <Flex
-          py="10"
+          py={{base:"30px", md: "10"}}
           px={{ base: "3", xl: "0" }}
           justifyContent={{ sm: "center", md: "space-between" }}
         >
@@ -263,7 +263,7 @@ export default function Footer() {
             alignItems="center"
             display={{ md: "none" }}
           >
-            <Flex justifyContent="space-between" maxW="360px" mx="auto">
+            {/*<Flex justifyContent="space-between" maxW="360px" mx="auto">
               <Menu direction="rtl">
                 <MenuButton
                   as={Button}
@@ -500,11 +500,12 @@ export default function Footer() {
                   </MenuItem>
                 </MenuList>
               </Menu>
-            </Flex>
+            </Flex>*/}
 
             <Flex
               px="10px"
-              py="40px"
+              //py="40px"
+              pb="40px"
               gap={{ base: "20px", sm: "40px" }}
               justifyContent="center"
             >

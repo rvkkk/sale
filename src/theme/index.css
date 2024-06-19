@@ -11,6 +11,10 @@
 * {
   box-sizing: border-box !important;
 }
+.mySwiper{
+  margin-left: 2;
+  padding: 2;
+}
 .mySwiper .swiper-slide {
   width: auto;
 }

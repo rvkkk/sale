@@ -126,9 +126,9 @@ export default function TopProducts() {
                 }
                 discount={
                   product["price-before-discount"] !== 0
-                    ? ((product["price-before-discount"] - product.price) /
+                    ? Math.round(((product["price-before-discount"] - product.price) /
                         product["price-before-discount"]) *
-                      100
+                      100)
                     : null
                 }
                 offers={product.offers}

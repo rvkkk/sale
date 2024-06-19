@@ -184,9 +184,9 @@ export default function Products({
                   }
                   discount={
                     product["price-before-discount"] !== 0
-                      ? ((product["price-before-discount"] - product.price) /
+                      ? Math.round(((product["price-before-discount"] - product.price) /
                           product["price-before-discount"]) *
-                        100
+                        100)
                       : null
                   }
                   offers={product.offers}
@@ -241,7 +241,8 @@ const ProductItem = ({
       }}
       cursor={"pointer"}
       boxShadow="none"
-      _hover={{ boxShadow: "2px 6px 25px 0 rgba(40, 53, 106, 0.2)" }}
+      my="2"
+      _hover={{ boxShadow: "1px 3px 10px 0 rgba(40, 53, 106, 0.2)" }}
       onClick={() =>
         (window.location.href = props.openingPrice
           ? routes.ProductPageAuction.path.replace(":id", "") + props.data._id
