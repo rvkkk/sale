@@ -7,13 +7,16 @@ import Input from "../components/Input";
 import { PasswordField } from "../components/Input";
 import SEOWrapper from "../components/SEO";
 import { routes } from "../routes";
-import { signup } from "../utils/api/users";
+import { googleSignin, signup } from "../utils/api/users";
 import { addToMailingList } from "../utils/api/mailingList";
 import Loader from "../components/Loader";
 //import { set } from "date-fns";
 import Layout from "../components/Layout";
 import Container from "../components/Container";
 import { RightIcon2 } from "../components/Icons";
+import axios from "axios";
+import { useGoogleLogin } from "@react-oauth/google";
+const googleUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 export default function SignUp() {
   // const [isRemember, setIsRemember] = useState(false);
@@ -137,6 +140,47 @@ export default function SignUp() {
         )
           .then((res) => {
             console.log(res);
+           if (res.status === "ok") {
+              window.localStorage.setItem("token", res.token);
+              if (getEmail)
+                addToMailingList(email)
+                  .then((res) => console.log(res))
+                  .catch((err) => console.log(err));
+              const p = window.localStorage.getItem("new product");
+              if (p) window.location.href = routes.CreateProduct.path;
+              else window.location.href = routes.HOME.path;
+            } else {
+              setLoading(false);
+            setError('כתובת דוא"ל זו או שם משתמש זה כבר קיימים במערכת');
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            setLoading(false);
+            setError('כתובת דוא"ל זו או שם משתמש זה כבר קיימים במערכת');
+          });
+      }
+  };
+
+  const SigninFromGoogle = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const { data } = await axios.get(googleUrl, {
+          headers: {
+            Authorization: `Bearer ${response.access_token}`,
+          },
+        });
+        console.log(data);
+        if (data.sub)
+          googleSignin(
+            data.email,
+            data.given_name,
+            data.family_name,
+            data.name,
+            data.sub,
+            data.picture
+          ).then((res) => {
+            console.log(res);
             if (res.status === "ok") {
               window.localStorage.setItem("token", res.token);
               if (getEmail)
@@ -147,16 +191,17 @@ export default function SignUp() {
               if (p) window.location.href = routes.CreateProduct.path;
               else window.location.href = routes.HOME.path;
             } else {
-              setError("ארעה שגיאה, אנא נסה שנית במועד מאוחר יותר");
+              setError('כתובת דוא"ל זו או שם משתמש זה כבר קיימים במערכת');
             }
           })
-          .catch((err) => {
-            console.log(err);
-            setLoading(false);
-            setError('כתובת דוא"ל זו או שם משתמש זה כבר קיימים במערכת');
-          });
+        else setError("קרתה תקלה, אנא נסה שוב במועד מאוחר יותר");
+      } catch (error) {
+        console.log(error);
       }
-  };
+    },
+    onFailure: (response) =>
+      setError("קרתה תקלה, אנא נסה שוב במועד מאוחר יותר"),
+  });
 
   return (
     <>
@@ -399,6 +444,7 @@ export default function SignUp() {
                     color="#6E6E73"
                     fontSize="16px"
                     fontWeight="normal"
+                    onClick={SigninFromGoogle}
                   >
                     <span>Sign in with Google</span>
                     <Image
@@ -705,6 +751,7 @@ export default function SignUp() {
                         color="#23263B"
                         bg="#F3F5F6"
                         border="none"
+                        onClick={SigninFromGoogle}
                       >
                         <Text fontSize="18px" fontWeight="medium">
                           Sign in with Google
