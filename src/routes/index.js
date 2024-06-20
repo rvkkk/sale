@@ -1,5 +1,8 @@
 import React from 'react';
-
+import Login from "../pages/Login";
+import Categories from '../pages/Categories';
+import Home from "../pages/Home";
+import SignUp from "../pages/SignUp";
 const BuySuccess = React.lazy(() => import("../pages/BuySuccess"));
 const Category = React.lazy(() => import("../pages/Category"));
 const CheckOut = React.lazy(() => import("../pages/CheckOut"));
@@ -10,8 +13,6 @@ const FAQ = React.lazy(() => import("../pages/FAQ"));
 const About = React.lazy(() => import("../pages/About"));
 const Article = React.lazy(() => import("../pages/Article"));
 const Regulations = React.lazy(() => import("../pages/Regulations"));
-const Home = React.lazy(() => import("../pages/Home"));
-const Login = React.lazy(() => import("../pages/Login"));
 const ForgetPassword = React.lazy(() => import("../pages/ForgetPassword"));
 const EmailAuth = React.lazy(() => import("../pages/EmailAuth"));
 const PaymentInfo = React.lazy(() => import("../pages/PaymentInfo"));
@@ -19,7 +20,6 @@ const ProductPage = React.lazy(() => import("../pages/ProductPage"));
 const ProductPageAuction = React.lazy(() => import("../pages/ProductPageAuction"));
 const ShippingDetails = React.lazy(() => import("../pages/ShippingDetails"));
 const ShoppingCart = React.lazy(() => import("../pages/ShoppingCart"));
-const SignUp = React.lazy(() => import("../pages/SignUp"));
 const UserSettings = React.lazy(() => import("../pages/UserSettings"));
 const UserSettingsDetails = React.lazy(() => import("../pages/UserSettingsDetails"));
 const UserSettingsDeliveryTraker = React.lazy(() => import("../pages/UserSettingsDeliveryTraker"));
@@ -30,7 +30,6 @@ const UserSettingsWallet = React.lazy(() => import("../pages/UserSettingsWallet"
 const UserSettingsWishList = React.lazy(() => import("../pages/UserSettingsWishList"));
 const CreatePArticle = React.lazy(() => import("../pages/createPArticle"));
 const AddCategory = React.lazy(() => import("../pages/AddCategory"));
-const Categories = React.lazy(() => import("../pages/Categories"));
 const SearchResults = React.lazy(() => import("../pages/searchResults"));
 
 export const routes = {

@@ -25,7 +25,7 @@ import {
   GridItem,
   Select,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useCallback } from "react";
 import Bbutton from "../components/Button";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -110,27 +110,27 @@ export default function CreateProduct() {
   // const [invalidPicture, setInvalidPicture] = useState("");
   const token = window.localStorage.getItem("token");
 
-  const handleDateTimeSubmit = () => {
+  const handleDateTimeSubmit = useCallback(() => {
     if (selectedDate) {
       let fullDateTime;
-      if(selectedTime)
-      fullDateTime = new Date(
-        selectedDate.getFullYear(),
-        selectedDate.getMonth(),
-        selectedDate.getDate(),
-        selectedTime.getHours(),
-        selectedTime.getMinutes()
-      );
+      if (selectedTime)
+        fullDateTime = new Date(
+          selectedDate.getFullYear(),
+          selectedDate.getMonth(),
+          selectedDate.getDate(),
+          selectedTime.getHours(),
+          selectedTime.getMinutes()
+        );
       else
-      fullDateTime = new Date(
-        selectedDate.getFullYear(),
-        selectedDate.getMonth(),
-        selectedDate.getDate()
-      );
+        fullDateTime = new Date(
+          selectedDate.getFullYear(),
+          selectedDate.getMonth(),
+          selectedDate.getDate()
+        );
       setStartTime(fullDateTime.toISOString());
       console.log("Selected Date & Time:", fullDateTime);
     }
-  };
+  },[selectedDate, selectedTime])
 
   const createProduct = () => {
     if (category === "") setInvalidMainCategory("שדה חובה");
@@ -162,14 +162,13 @@ export default function CreateProduct() {
           filesOnly.push(file);
         });
         let start = startTime;
-        if(start === null)
-{
-  const now = new Date();
-  start = now.toISOString();
-}
-const date = new Date(start);
-  date.setDate(date.getDate() + timeFrame);
-  const end = date.toISOString();
+        if (start === null) {
+          const now = new Date();
+          start = now.toISOString();
+        }
+        const date = new Date(start);
+        date.setDate(date.getDate() + timeFrame);
+        const end = date.toISOString();
         addAuctionProduct(
           name,
           barcode,
@@ -194,7 +193,7 @@ const date = new Date(start);
         ).then((res) => {
           console.log(res);
           if (res.status === "ok") {
-            window.localStorage.removeItem("new product")
+            window.localStorage.removeItem("new product");
             window.location.href = routes.UserSettingsMySales.path;
           } else {
             setLoading(false);
@@ -251,7 +250,7 @@ const date = new Date(start);
           .then((res) => {
             console.log(res);
             if (res.status === "ok") {
-              window.localStorage.removeItem("new product")
+              window.localStorage.removeItem("new product");
               window.location.href = routes.UserSettingsMySales.path;
             } else {
               setLoading(false);
@@ -475,7 +474,6 @@ const date = new Date(start);
         setShadow(2);
       } else {
         setOpeningPrice(p.openingPrice);
-
       }
     }
   }, []);
@@ -1222,94 +1220,103 @@ const date = new Date(start);
                           התחל מיידית
                         </Button>
                         <Popover closeOnBlur={false}>
-                        {({ onClose }) => (
-                          <>
-                          <PopoverTrigger>
-                            <Button
-                              h={{ base: "50px", md: "40px" }}
-                              w={{
-                                base: "154px",
-                                sm: "220px",
-                                md: "-webkit-fit-content",
-                              }}
-                              variant="outline"
-                              borderColor={{
-                                base:
-                                  time === 2 ? "primaryLight" : "transparent",
-                                md: time === 2 ? "primary" : "bright",
-                              }}
-                              fontWeight="normal"
-                              _hover={time !== 2 && { bg: "bright" }}
-                              color={{
-                                base: time === 2 ? "primary" : "naturalDarkest",
-                                md: time === 2 ? "white" : "naturalDarkest",
-                              }}
-                              bgColor={{
-                                base:
-                                  time === 2 ? "primaryLightest" : "inputBg",
-                                md: time === 2 ? "primary" : "white",
-                              }}
-                              borderRadius={{ base: "12px", md: "10px" }}
-                              onClick={() => {
-                                setTime(2);
-                              }}
-                            >
-                              קבע תאריך ושעה
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent>
-                            <PopoverArrow />
-                            <PopoverCloseButton/>
-                            <PopoverHeader>קבע תאריך ושעה</PopoverHeader>
-                            <PopoverBody>
-                              <Flex
-                                flexDir="column"
-                                justifyContent="center"
-                                alignItems="center"
-                                gap="3"
-                              >
-                                <DatePicker
-                                  selected={selectedDate}
-                                  onChange={setSelectedDate}
-                                  dateFormat="dd/MM/yyyy"
-                                  placeholderText="בחר תאריך"
-                                  className="date-picker"
-                                  minDate={new Date()}
-                                />
-                                <DatePicker
-                                  selected={selectedTime}
-                                  onChange={setSelectedTime}
-                                  showTimeSelect
-                                  showTimeSelectOnly
-                                  timeIntervals={15}
-                                  timeCaption="זמן"
-                                  dateFormat="HH:mm"
-                                  placeholderText="בחר שעה"
-                                  className="time-picker"
-                                />
+                          {({ onClose }) => (
+                            <>
+                              <PopoverTrigger>
                                 <Button
-                                  alignItems="center"
-                                  justifyContent="center"
-                                  h="35px"
-                                  w={{ base: "70px", md: "80px" }}
-                                  fontSize={{ base: "14px", md: "16px" }}
+                                  h={{ base: "50px", md: "40px" }}
+                                  w={{
+                                    base: "154px",
+                                    sm: "220px",
+                                    md: "-webkit-fit-content",
+                                  }}
+                                  variant="outline"
+                                  borderColor={{
+                                    base:
+                                      time === 2
+                                        ? "primaryLight"
+                                        : "transparent",
+                                    md: time === 2 ? "primary" : "bright",
+                                  }}
                                   fontWeight="normal"
-                                  _hover={{ bg: "primaryHover" }}
-                                  color="white"
-                                  bgColor="primary"
+                                  _hover={time !== 2 && { bg: "bright" }}
+                                  color={{
+                                    base:
+                                      time === 2 ? "primary" : "naturalDarkest",
+                                    md: time === 2 ? "white" : "naturalDarkest",
+                                  }}
+                                  bgColor={{
+                                    base:
+                                      time === 2
+                                        ? "primaryLightest"
+                                        : "inputBg",
+                                    md: time === 2 ? "primary" : "white",
+                                  }}
                                   borderRadius={{ base: "12px", md: "10px" }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDateTimeSubmit();
-                                    onClose();
+                                  onClick={() => {
+                                    setTime(2);
                                   }}
                                 >
-                                  אישור
+                                  קבע תאריך ושעה
                                 </Button>
-                              </Flex>
-                            </PopoverBody>
-                          </PopoverContent>
-                          </>)}
+                              </PopoverTrigger>
+                              <PopoverContent>
+                                <PopoverArrow />
+                                <PopoverCloseButton />
+                                <PopoverHeader>קבע תאריך ושעה</PopoverHeader>
+                                <PopoverBody>
+                                  <Flex
+                                    flexDir="column"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    gap="3"
+                                  >
+                                    <DatePicker
+                                      selected={selectedDate}
+                                      onChange={setSelectedDate}
+                                      dateFormat="dd/MM/yyyy"
+                                      placeholderText="בחר תאריך"
+                                      className="date-picker"
+                                      minDate={new Date()}
+                                    />
+                                    <DatePicker
+                                      selected={selectedTime}
+                                      onChange={setSelectedTime}
+                                      showTimeSelect
+                                      showTimeSelectOnly
+                                      timeIntervals={15}
+                                      timeCaption="זמן"
+                                      dateFormat="HH:mm"
+                                      placeholderText="בחר שעה"
+                                      className="time-picker"
+                                    />
+                                    <Button
+                                      alignItems="center"
+                                      justifyContent="center"
+                                      h="35px"
+                                      w={{ base: "70px", md: "80px" }}
+                                      fontSize={{ base: "14px", md: "16px" }}
+                                      fontWeight="normal"
+                                      _hover={{ bg: "primaryHover" }}
+                                      color="white"
+                                      bgColor="primary"
+                                      borderRadius={{
+                                        base: "12px",
+                                        md: "10px",
+                                      }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDateTimeSubmit();
+                                        onClose();
+                                      }}
+                                    >
+                                      אישור
+                                    </Button>
+                                  </Flex>
+                                </PopoverBody>
+                              </PopoverContent>
+                            </>
+                          )}
                         </Popover>
                       </Flex>
 

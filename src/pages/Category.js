@@ -98,21 +98,17 @@ export default function Category() {
   };
 
   useEffect(() => {
-    if (!category.name) {
-      let category = window.location.href.split("/").pop().split("/")[0];
-      getSubcategory(category).then((res) => {
-        console.log(res);
-        setCategory(res.subcategory);
-      });
-    } else getProducts(category.name);
-  }, [sortBy, category]);
-
-  /* useEffect(() => {
-    category.name && getProducts();
-  }, [category, sortBy]);*/
+    let category = window.location.href.split("/").pop().split("/")[0];
+    getSubcategory(category).then((res) => {
+      console.log(res);
+      setCategory(res.subcategory);
+      setLoading(false);
+      getProducts(res.subcategory.name);
+    });
+  }, []);
 
   const getProducts = (categoryName) => {
-   // setLoading(true);
+    // setLoading(true);
     searchProducts(categoryName, tags, 1, 21, minPrice, maxPrice, sortBy)
       .then((res) => {
         console.log(res);
@@ -147,13 +143,17 @@ export default function Category() {
       {loading ? (
         <Loader />
       ) : (
-        <Flex justifyContent="center">
+        <Flex
+          mx={{ md: "50px", lg: "100px", "2xl": "200px" }}
+          justifyContent="center"
+        >
           <Flex
             display={{ base: "none", md: "flex" }}
             pb="20"
-            mt="30px"
+            //mt="30px"
             gap="10"
             dir="rtl"
+
             // mx={["16px", "32px", "50px", "100px", "200px"]}
           >
             <Box>
@@ -357,7 +357,14 @@ export default function Category() {
               )}
 
               {isList ? (
-                <Flex w="1154px" flexDirection="column" gap="6" mt="8">
+                <Flex
+                  w={{ md: "100%" }}
+                  minW="500px"
+                  maxW="1154px"
+                  flexDirection="column"
+                  gap="6"
+                  mt="8"
+                >
                   {products[0] &&
                     products.map((item) => {
                       return <CartListItem data={item} />;
@@ -365,8 +372,13 @@ export default function Category() {
                 </Flex>
               ) : (
                 <Grid
-                  w="1154px"
-                  gridTemplateColumns="repeat(3, 1fr)"
+                  w={{ md: "100%" }}
+                  minW="500px"
+                  maxW="1154px"
+                  gridTemplateColumns={{
+                    md: "repeat(2, 1fr)",
+                    xl: "repeat(3, 1fr)",
+                  }}
                   gap="6"
                   mt="8"
                 >
@@ -393,7 +405,7 @@ export default function Category() {
           </Flex>
           <Flex flexDir="column" display={{ base: "flex", md: "none" }}>
             <Flex
-              w={{ base: "336px" }}
+              w={{ base: "336px", sm: "460px" }}
               dir="rtl"
               mx="auto"
               justifyContent="space-between"

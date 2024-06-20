@@ -191,7 +191,7 @@ export default function SignUp() {
               if (p) window.location.href = routes.CreateProduct.path;
               else window.location.href = routes.HOME.path;
             } else {
-              setError('כתובת דוא"ל זו או שם משתמש זה כבר קיימים במערכת');
+              setError('כתובת דוא"ל זו כבר קיימת במערכת');
             }
           })
         else setError("קרתה תקלה, אנא נסה שוב במועד מאוחר יותר");
@@ -217,9 +217,10 @@ export default function SignUp() {
               />
               <Flex
                 flexDirection="column"
-                mt="300"
+                mt="100"
                 gap="6"
-                w="60%"
+                w="90%"
+                h="100vh"
                 maxW="670px"
               >
                 <Heading fontWeight="semibold" fontSize={24}>
@@ -234,7 +235,7 @@ export default function SignUp() {
                       required
                       labelFontSize="14px"
                       labelFontWeight="medium"
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       borderRadius="8px"
                       borderColor="bright"
                       onChange={(e) => {
@@ -248,7 +249,7 @@ export default function SignUp() {
                       isInvalid={invalidLastName !== ""}
                       isInvalidMessage={invalidLastName}
                       required
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       onChange={(e) => {
                         setLastName(e.target.value);
                         setInvalidLastName("");
@@ -262,7 +263,7 @@ export default function SignUp() {
                       tip="שם משתמש יכיל בין 4 ל- 8 אותיות"
                       required
                       maxLength="8"
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       onChange={(e) => {
                         setUserName(e.target.value);
                         handleUserNameChange(e.target.value);
@@ -275,7 +276,7 @@ export default function SignUp() {
                       isInvalidMessage={invalidPassword}
                       tip="יש להזין סיסמה המורכבת מ8-16 תווים, אותיות באנגלית (אות גדולה ואות קטנה אחת לפחות) וספרות בלבד."
                       required
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       onChange={(e) => {
                         setPassword(e.target.value);
                         handlePasswordChange(e.target.value);
@@ -287,7 +288,7 @@ export default function SignUp() {
                       isInvalid={invalidPhoneNumber !== ""}
                       isInvalidMessage={invalidPhoneNumber}
                       required
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       type="tel"
                       onChange={(e) => {
                         setPhoneNumber(e.target.value);
@@ -301,7 +302,7 @@ export default function SignUp() {
                       isInvalid={invalidEmail !== ""}
                       isInvalidMessage={invalidEmail}
                       required
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       tip='אנא הכנס כתובת דוא"ל תקינה'
                       onChange={(e) => {
                         setEmail(e.target.value);
@@ -327,7 +328,7 @@ export default function SignUp() {
                       isInvalid={invalidCountry !== ""}
                       isInvalidMessage={invalidCountry}
                       required
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       onChange={(e) => {
                         setCountry(e.target.value);
                         setInvalidCountry("");
@@ -339,7 +340,7 @@ export default function SignUp() {
                       isInvalid={invalidCity !== ""}
                       isInvalidMessage={invalidCity}
                       required
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       onChange={(e) => {
                         setCity(e.target.value);
                         setInvalidCity("");
@@ -351,7 +352,7 @@ export default function SignUp() {
                       isInvalid={invalidStreet !== ""}
                       isInvalidMessage={invalidStreet}
                       required
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       onChange={(e) => {
                         setStreet(e.target.value);
                         setInvalidStreet("");
@@ -363,7 +364,7 @@ export default function SignUp() {
                       isInvalid={invalidBuildingNumber !== ""}
                       isInvalidMessage={invalidBuildingNumber}
                       required
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       onChange={(e) => {
                         setBuildingNumber(e.target.value);
                         setInvalidBuildingNumber("");
@@ -375,7 +376,7 @@ export default function SignUp() {
                       isInvalid={invalidFloor !== ""}
                       isInvalidMessage={invalidFloor}
                       required
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       type="number"
                       onChange={(e) => {
                         setFloor(e.target.value);
@@ -388,7 +389,7 @@ export default function SignUp() {
                       isInvalid={invalidApartmentNumber !== ""}
                       isInvalidMessage={invalidApartmentNumber}
                       required
-                      w="329px"
+                      w={{md: "100%", xl:"329px"}}
                       type="number"
                       onChange={(e) => {
                         setApartmentNumber(e.target.value);
@@ -420,15 +421,16 @@ export default function SignUp() {
                         "מעוניין לקבל התראות על מבצעים חדשים באתר ישירות למייל"
                       }
                     ></Checkbox>
-                  </Flex>
-                </Flex>
-                {error && (
+                    {error && (
                   <Flex alignItems="center" justifyContent="center" w="full">
                     <Text fontSize="16px" fontWeight="light" color="otherError">
                       {error}
                     </Text>
                   </Flex>
                 )}
+                  </Flex>
+                </Flex>
+                
                 <Flex
                   flexDirection="column"
                   gap="3"
@@ -454,7 +456,7 @@ export default function SignUp() {
                   </Button.Secondary>
                 </Flex>
 
-                <Flex w="full" justifyContent="center" gap="2">
+                <Flex w="full" justifyContent="center" gap="2" pb="10">
                   <Text fontSize="16px" color="naturalDarkest">
                     יש לך כבר חשבון?
                   </Text>

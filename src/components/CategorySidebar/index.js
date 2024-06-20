@@ -85,8 +85,8 @@ export default function CategorySidebar(props) {
   }, [tags]);
 
   return (
-    <Box w={{base: "360px", sm: "480px", md: "292px"}} dir="rtl">
-      <Text fontSize="32px" color="primary" display={{base: "none", md: "block"}}>
+    <Box w={{base: "360px", sm: "480px", md: "200px", xl: "292px"}} dir="rtl">
+      <Text fontSize={{md: "26px", lg: "28px", xl: "32px"}} color="primary" display={{base: "none", md: "block"}}>
         {props.categoryName}
       </Text>
       <Flex
@@ -125,8 +125,8 @@ export default function CategorySidebar(props) {
                 <Flex justifyContent="space-between">
                   <Badge
                     p="2"
-                    px="6"
-                    w="92px"
+                    px={{base: "6", md: "4", lg:"6"}}
+                    w={{base: "92px", md: "75px", lg:"92px"}}
                     borderRadius="45px"
                     bg="naturalLightest"
                   >
@@ -134,23 +134,23 @@ export default function CategorySidebar(props) {
                   </Badge>
                   <Badge
                     p="2"
-                    px="6"
-                    w="92px"
+                    px={{base: "6", md: "4", xl:"6"}}
+                    w={{base: "92px", md: "75px", lg:"92px"}}
                     borderRadius="45px"
                     bg="naturalLightest"
                   >
                     {sliderValue[1]} ₪
                   </Badge>
                 </Flex>
-                <Box w={{base: "278px", md: "250px"}} h="24px" mx="auto">
+                <Box w={{base: "278px", md: "168px", xl: "250px"}} h="24px" mx="auto">
                   <RangeSlider
                     ariaLabel={["min", "max"]}
                     size="lg"
                     display="block !important"
                     //onChangeEnd={(val) => props.onChangePriceSlider(val)}
                     defaultValue={[props.minPrice, props.maxPrice]}
-                    min={100}
-                    max={2000}
+                    min={props.minPrice}
+                    max={props.maxPrice}
                     step={5}
                     //focusThumbOnChange={true}
                     onChange={(val) => setSliderValue(val)}

@@ -224,7 +224,7 @@ export default function Categories() {
         }}
         gap={{base: "19px", xl: "20px", "2xl": "30px"}}
         mx="auto"
-        my="50px"
+        mb="50px"
       >
         {products[0] &&
           products.map((product, key) => {
@@ -242,9 +242,9 @@ export default function Categories() {
                 }
                 discount={
                   product["price-before-discount"] !== 0
-                    ? ((product["price-before-discount"] - product.price) /
+                    ? Math.round(((product["price-before-discount"] - product.price) /
                         product["price-before-discount"]) *
-                      100
+                      100)
                     : null
                 }
                 offers={product.offers}
