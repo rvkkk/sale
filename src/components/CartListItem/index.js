@@ -118,35 +118,43 @@ export default function CartListItem(props) {
         cursor={"pointer"}
       >
         <Box>
-          <Flex gap="4">
-            <Box w="256px" h="187px" borderRadius="26px">
+          <Flex gap="4">      
               <Image
-                w="full"
-                h="full"
+              borderRadius="26px"
+              w={{ base: "100px", md: "120px", xl: "180px", "2xl": "220px" }}
+                aspectRatio="1/1"
                 objectFit="cover"
                 src={product.images && product.images[0]}
               />
-            </Box>
-            <Flex flex="1" flexDir="row" justifyContent="space-between">
+            <Flex flex="1" flexDir="row" gap="7" justifyContent="space-between">
               <Flex flex="1" flexDir="column" justifyContent="space-between">
                 <Flex justifyContent="space-between" alignItems="center">
-                  <Box>
+                  <Flex flexDir="column" gap="1">
                     <Text
-                      fontSize="20px"
+                      fontSize={{md: "16px", xl: "18px", "2xl": "20px"}}
                       letterSpacing="-0.01em"
                       lineHeight="23px"
+                      fontWeight="light"
+                      display="-webkit-box"
+                      overflow="hidden"
+                      textOverflow="ellipsis"
+                      id="desc"
                     >
                       {product.title}
                     </Text>
                     <Text
-                      fontSize="17px"
+                      fontSize={{md: "14px", xl: "17px", "2xl": "18px"}}
                       letterSpacing="-0.01em"
                       lineHeight="23px"
                       color="naturalDarkest"
+                      display="-webkit-box"
+                      overflow="hidden"
+                      textOverflow="ellipsis"
+                      id="desc"
                     >
-                      דגם GW0260G4
+                      {product.description}
                     </Text>
-                  </Box>
+                  </Flex>
                   {product.openingPrice && (
                     <Box pb="6">
                       <Box transform="translateX(50px)">
@@ -160,7 +168,7 @@ export default function CartListItem(props) {
                 </Flex>
               </Flex>
 
-              <Flex flex="1" flexDir="column" justifyContent="space-between">
+              <Flex flex="1" flexDir="column" justifyContent="space-between" alignItems="end">
                 <Flex justifyContent="end" gap="4" alignItems="center">
                   {product.openingPrice && (
                     <Badge>
@@ -180,7 +188,7 @@ export default function CartListItem(props) {
                   >
                     <IconButton
                       bg="white"
-                      _hover={{bg: "white"}}
+                      _hover={{ bg: "white" }}
                       w="30px"
                       h="30px"
                       borderRadius="full"
@@ -196,20 +204,20 @@ export default function CartListItem(props) {
                 </Flex>
 
                 {product.currentPrice ? (
-                  <Flex alignItems="end">
+                                    <Flex w={{md: "200px", lg: "230px", xl: "280px", "2xl": "300px"}} gap={{md: "3", xl: "6"}} alignItems="end" justifyContent="end">
                     {product.winningPrice === 0 ? (
                       <>
                         <Box flex="1">
-                          <Text fontSize="18px" color="naturalDark">
+                          <Text fontSize={{base: "16px", lg: "18px"}} color="naturalDark">
                             הצעה מובילה
                           </Text>
                           <Text
                             dir="rtl"
                             fontWeight="medium"
-                            fontSize="24px"
-                            lineHeight="30px"
+                            fontSize={{base: "18px", lg: "20px", xl: "24px"}}
+                            lineHeight={{base: "24px", lg: "26px", xl: "30px"}}
                           >
-                            ₪ {product.currentPrice}
+                             {product.currentPrice || product.openingPrice} ₪
                           </Text>
                         </Box>
 
@@ -226,8 +234,8 @@ export default function CartListItem(props) {
                         >
                           <PopoverTrigger>
                             <Button
-                              w="126px"
-                              h="60px"
+                               w={{base: "100px", lg: "120px", xl: "126px"}}
+                               h={{base: "50px", xl: "60px"}}
                               fontSize="18px"
                               lineHeight="20px"
                             >
@@ -257,21 +265,21 @@ export default function CartListItem(props) {
                     ) : (
                       <>
                         <Box flex="1">
-                          <Text fontSize="18px" color="naturalDark">
+                          <Text fontSize={{base: "16px", lg: "18px"}} color="naturalDark">
                             נמכר
                           </Text>
                           <Text
                             dir="rtl"
                             fontWeight="medium"
-                            fontSize="24px"
-                            lineHeight="30px"
+                            fontSize={{base: "18px", lg: "20px", xl: "24px"}}
+                            lineHeight={{base: "24px", lg: "26px", xl: "30px"}}
                           >
-                            ₪ {product.winningPrice}
+                             {product.winningPrice} ₪
                           </Text>
                         </Box>
                         <Button
-                          w="126px"
-                          h="60px"
+                           w={{base: "100px", lg: "120px", xl: "126px"}}
+                           h={{base: "50px", xl: "60px"}}
                           fontSize="18px"
                           lineHeight="20px"
                           isDisabled
@@ -282,25 +290,23 @@ export default function CartListItem(props) {
                     )}
                   </Flex>
                 ) : (
-                  <Flex alignItems="end">
-                    <Box flex="1" alignItems="end">
-                      <Text fontSize="18px" color="naturalDark">
+                  <Flex w={{md: "200px", lg: "230px", xl: "280px", "2xl": "300px"}} gap={{md: "3", xl: "6"}} alignItems="end" justifyContent="end">
+                    <Box alignItems="end">
+                      <Text fontSize={{base: "16px", xl: "18px"}} color="naturalDark">
                         מחיר
                       </Text>
                       <Text
                         dir="rtl"
                         fontWeight="medium"
-                        fontSize="24px"
-                        lineHeight="30px"
-                      >{removeDecimal(
-                          (product.price * (100 - product.discount)) / 100
-                        )}{" "}
-                        ₪    
+                        fontSize={{base: "18px", lg: "20px", xl: "24px"}}
+                        lineHeight={{base: "24px", lg: "26px", xl: "30px"}}
+                      >
+                          {product.price} ₪
                       </Text>
                     </Box>
                     <Button
-                      w="126px"
-                      h="60px"
+                      w={{base: "100px", lg: "120px", xl: "126px"}}
+                      h={{base: "50px", xl: "60px"}}
                       fontSize="18px"
                       lineHeight="20px"
                       onClick={() =>

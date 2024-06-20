@@ -122,10 +122,10 @@ export default function CartItemGallery(props) {
         <Card
           className="galleryCard"
           cursor="pointer"
-          w="370px"
+          w="100%"
           borderRadius="32px"
           dir="rtl"
-          p="20px"
+          p="10px"
           bg="white"
           position="relative"
           border="2px solid"
@@ -135,16 +135,15 @@ export default function CartItemGallery(props) {
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
           display={{ base: "none", md: "block" }}
-          onClick={() => 
-              window.location.href = product.openingPrice
-                ? routes.ProductPageAuction.path.replace(":id", "") +
-                  product._id
-                : routes.ProductPage.path.replace(":id", "") + product._id
+          onClick={() =>
+            (window.location.href = product.openingPrice
+              ? routes.ProductPageAuction.path.replace(":id", "") + product._id
+              : routes.ProductPage.path.replace(":id", "") + product._id)
           }
         >
           <Image
-            w="350px"
-            h="338px"
+            w="auto"
+            aspectRatio="1/1"
             borderRadius="26px"
             objectFit="cover"
             src={images && images[0]}
@@ -161,9 +160,18 @@ export default function CartItemGallery(props) {
                 <Spacer h="1px" />
               </Box>
             )}
-            {!product.openingPrice && <Spacer h="10" />}
+            {!product.openingPrice && <Spacer h={{ md: "5", xl: "10" }} />}
+            <Flex flexDir="column" justifyContent="space-between" h="118px">
             <Flex flexDir="column" gap="2">
-              <Text fontSize="24px" letterSpacing="-0.01em" lineHeight="24px">
+              <Text
+                fontSize={{ md: "18px", xl: "20px", "2xl": "24px" }}
+                letterSpacing="-0.01em"
+                lineHeight="24px"
+                display="-webkit-box"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                id="desc"
+              >
                 {product.title}
               </Text>
               {props.myItem &&
@@ -185,8 +193,8 @@ export default function CartItemGallery(props) {
                   </Text>
                 ))}
             </Flex>
-            <Spacer h="4" />
-            <Flex gap="8" alignItems="center">
+            <Spacer h={{ md: "5", xl: "10" }} />
+            <Flex justifyContent="space-between" alignItems="center">
               {product.openingPrice ? (
                 <>
                   {product.winningPrice === 0 ? (
@@ -219,10 +227,17 @@ export default function CartItemGallery(props) {
                 </>
               ) : (
                 <Box flex="1">
-                  <Text fontSize="18px" color="naturalDark">
+                  <Text
+                    fontSize={{ base: "16px", lg: "18px" }}
+                    color="naturalDark"
+                  >
                     מחיר
                   </Text>
-                  <Text fontWeight="medium" fontSize="24px" lineHeight="30px">
+                  <Text
+                    fontWeight="medium"
+                    fontSize={{ base: "18px", lg: "20px", xl: "24px" }}
+                    lineHeight={{ base: "24px", lg: "26px", xl: "30px" }}
+                  >
                     {removeDecimal(product.price)} ₪
                   </Text>
                 </Box>
@@ -246,8 +261,8 @@ export default function CartItemGallery(props) {
                           >
                             <PopoverTrigger>
                               <Button
-                                w="126px"
-                                h="60px"
+                                w={{base: "100px", lg: "120px", xl: "126px"}}
+                                h={{base: "50px", xl: "60px"}}
                                 fontSize="18px"
                                 lineHeight="20px"
                               >
@@ -277,8 +292,8 @@ export default function CartItemGallery(props) {
                       ) : (
                         <Box position="relative">
                           <Button
-                            w="126px"
-                            h="60px"
+                           w={{base: "100px", lg: "120px", xl: "126px"}}
+                           h={{base: "50px", xl: "60px"}}
                             fontSize="18px"
                             lineHeight="20px"
                             isDisabled
@@ -291,8 +306,8 @@ export default function CartItemGallery(props) {
                   ) : (
                     <Box position="relative">
                       <Button
-                        w="126px"
-                        h="60px"
+                        w={{base: "100px", lg: "120px", xl: "126px"}}
+                        h={{base: "50px", xl: "60px"}}
                         fontSize="18px"
                         lineHeight="20px"
                         onClick={(e) => {
@@ -331,6 +346,7 @@ export default function CartItemGallery(props) {
                   </Button>
                 </Box>
               )}
+            </Flex>
             </Flex>
           </Box>
           {hover && (
@@ -414,6 +430,10 @@ export default function CartItemGallery(props) {
               fontSize="14px"
               letterSpacing="-0.01em"
               lineHeight="18px"
+              display="-webkit-box"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              id="desc"
             >
               {product.title}
             </Text>

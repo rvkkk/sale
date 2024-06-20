@@ -27,13 +27,13 @@ export default function ProductTimeClock(props) {
       >
         <ClockBigIcon />
         <Text fontSize="24px" lineHeight="42px" color="primary">
-          {`${timeLeft.days < 10 ? "0" + timeLeft.days : timeLeft.days}d : ${
+          {`${timeLeft.days < 10 ? "0" + timeLeft.days : timeLeft.days} : ${
             timeLeft.hours < 10 ? "0" + timeLeft.hours : timeLeft.hours
-          }h : ${
+          } : ${
             timeLeft.minutes < 10 ? "0" + timeLeft.minutes : timeLeft.minutes
-          }m : ${
+          } : ${
             timeLeft.seconds < 10 ? "0" + timeLeft.seconds : timeLeft.seconds
-          }s`}
+          }`}
         </Text>
       </Flex>
       <Flex
@@ -53,13 +53,13 @@ export default function ProductTimeClock(props) {
           letterSpacing="0.02em"
           color="naturalWhite"
         >
-          {`${timeLeft.days < 10 ? "0" + timeLeft.days : timeLeft.days}d :${
+          {`${timeLeft.days < 10 ? "0" + timeLeft.days : timeLeft.days} :${
             timeLeft.hours < 10 ? "0" + timeLeft.hours : timeLeft.hours
-          }h : ${
+          } : ${
             timeLeft.minutes < 10 ? "0" + timeLeft.minutes : timeLeft.minutes
-          }m : ${
+          } : ${
             timeLeft.seconds < 10 ? "0" + timeLeft.seconds : timeLeft.seconds
-          }s`}
+          }`}
         </Text>
       </Flex>
     </>

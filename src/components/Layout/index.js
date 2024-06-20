@@ -83,7 +83,7 @@ export default function Layout({
               </Flex>
             )}
             <Box>
-              <Flex px={["0px", "32px", "50px", "100px", "200px"]}>
+              <Flex px={{base: "0px", sm: "32px", md: "50px", lg: "100px", "2xl": "200px"}}>
                 {breadcrumb.length > 0 && (
                   <BreadcrumbComponent breadcrumb={breadcrumb} />
                 )}

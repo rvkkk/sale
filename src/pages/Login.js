@@ -164,6 +164,7 @@ export default function Login() {
             else window.location.href = routes.HOME.path;
           } else {
             setLoading(false);
+            setError("אינך שמור במערכת, עבור לדבר הרשמה");
           }
         })
         else setError("קרתה תקלה, אנא נסה שוב במועד מאוחר יותר");
@@ -405,9 +406,7 @@ export default function Login() {
                             src={process.env.PUBLIC_URL + "/assets/Google.svg"}
                           />
                         </Button.Secondary>
-                      </Flex>
-                    </Box>
-                    <Flex w="full" justifyContent="center" gap="2">
+                        <Flex w="full" justifyContent="center" gap="2" pb="20px">
                       <Text fontSize="16px" color="naturalDarkest">
                         אין לך חשבון עדיין?
                       </Text>
@@ -421,6 +420,9 @@ export default function Login() {
                         פתח חשבון
                       </Link>
                     </Flex>
+                      </Flex>
+                    </Box>
+                    
                   </Flex>
                 </Box>
               </Container>

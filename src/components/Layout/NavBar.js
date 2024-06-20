@@ -79,7 +79,7 @@ export default function NavBar({ withSidebar, logo, change }) {
   const [products, setProducts] = useState([]);
   const [fetchedUser, setFetchedUser] = useState(false);
   const [userLogged, setUserLogged] = useState(false);
-  const token = window.localStorage.getItem("token");
+  const [token, setToken] = useState(window.localStorage.getItem("token"));
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [hideOnScroll, setHideOnScroll] = useState(false);
   const [fixedLinks, setFixedLinks] = useState(false);
@@ -108,6 +108,7 @@ export default function NavBar({ withSidebar, logo, change }) {
           setUserLogged(true);
         })
         .catch((err) => {
+          setToken(null);
           setUserLogged(false);
           setFetchedUser(true);
         });

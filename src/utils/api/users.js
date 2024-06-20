@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useGoogleLogin } from "@react-oauth/google";
 
 //const baseURL = "http://localhost:3001/";
 const baseURL = "https://sale-bid.df.r.appspot.com/";
@@ -8,7 +7,6 @@ const headers = {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 };
-const googleUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 const onTokenBroken = () => {
   localStorage.removeItem("token");
