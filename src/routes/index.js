@@ -5,6 +5,8 @@ import Home from "../pages/Home";
 import SignUp from "../pages/SignUp";
 const BuySuccess = React.lazy(() => import("../pages/BuySuccess"));
 const Category = React.lazy(() => import("../pages/Category"));
+const AuctionProducts = React.lazy(() => import("../pages/AuctionProducts"));
+const Products = React.lazy(() => import("../pages/Products"));
 const CheckOut = React.lazy(() => import("../pages/CheckOut"));
 const ContactUs = React.lazy(() => import("../pages/ContactUs"));
 const CreateProduct = React.lazy(() => import("../pages/CreateProduct"));
@@ -64,6 +66,10 @@ export const routes = {
     Categories: {
         path: "/:category",
         component: Categories
+    },
+    AuctionProducts: {
+        path: "/auction-products",
+        component: AuctionProducts
     },
     SearchResults: {
         path: "/search-results/:query",

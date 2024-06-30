@@ -162,203 +162,207 @@ export default function CartItemGallery(props) {
             )}
             {!product.openingPrice && <Spacer h={{ md: "5", xl: "10" }} />}
             <Flex flexDir="column" justifyContent="space-between" h="118px">
-            <Flex flexDir="column" gap="2">
-              <Text
-                fontSize={{ md: "18px", xl: "20px", "2xl": "24px" }}
-                letterSpacing="-0.01em"
-                lineHeight="24px"
-                display="-webkit-box"
-                overflow="hidden"
-                textOverflow="ellipsis"
-                id="desc"
-              >
-                {product.title}
-              </Text>
-              {props.myItem &&
-                (product.openingPrice ? (
-                  <Text
-                    fontSize="18px"
-                    letterSpacing="-0.01em"
-                    lineHeight="24px"
-                  >
-                    {product.offers.length} הצעות
-                  </Text>
+              <Flex flexDir="column" gap="2">
+                <Text
+                  fontSize={{ md: "18px", xl: "20px", "2xl": "24px" }}
+                  letterSpacing="-0.01em"
+                  lineHeight="24px"
+                  //height="48px"
+                  display="-webkit-box"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  id="desc"
+                >
+                  {product.title}
+                </Text>
+                {props.myItem &&
+                  (product.openingPrice ? (
+                    <Text
+                      fontSize="18px"
+                      letterSpacing="-0.01em"
+                      lineHeight="24px"
+                    >
+                      {product.offers.length} הצעות
+                    </Text>
+                  ) : (
+                    <Text
+                      fontSize="18px"
+                      letterSpacing="-0.01em"
+                      lineHeight="24px"
+                    >
+                      {product.numOfBuy} הזמנות
+                    </Text>
+                  ))}
+              </Flex>
+              <Spacer h={{ md: "5", xl: "10" }} />
+              <Flex justifyContent="space-between" alignItems="center">
+                {product.openingPrice ? (
+                  <>
+                    {product.winningPrice === 0 ? (
+                      <Box flex="1">
+                        <Text fontSize={{md: "14px", lg: "18px"}} color="naturalDark">
+                          הצעה מובילה
+                        </Text>
+                        <Text
+                          fontWeight="medium"
+                          fontSize={{md: product.openingPrice >= 100000 ? "16px" : "18px", lg: "24px"}}
+                          lineHeight={{md: "24px", lg: "26px", xl: "30px"}}
+                        >
+                          {removeDecimal(product.currentPrice || product.openingPrice)} ₪
+                        </Text>
+                      </Box>
+                    ) : (
+                      <Box flex="1">
+                        <Text fontSize={{md: "14px", lg: "18px"}} color="naturalDark">
+                          נמכר
+                        </Text>
+                        <Text
+                          fontWeight="medium"
+                          fontSize={{md: product.openingPrice >= 100000 ? "16px" : "18px", lg: "24px"}}
+                          lineHeight={{md: "24px", lg: "26px", xl: "30px"}}
+                        >
+                          {product.winningPrice} ₪
+                        </Text>
+                      </Box>
+                    )}
+                  </>
                 ) : (
-                  <Text
-                    fontSize="18px"
-                    letterSpacing="-0.01em"
-                    lineHeight="24px"
-                  >
-                    {product.numOfBuy} הזמנות
-                  </Text>
-                ))}
-            </Flex>
-            <Spacer h={{ md: "5", xl: "10" }} />
-            <Flex justifyContent="space-between" alignItems="center">
-              {product.openingPrice ? (
-                <>
-                  {product.winningPrice === 0 ? (
-                    <Box flex="1">
-                      <Text fontSize="18px" color="naturalDark">
-                        הצעה מובילה
-                      </Text>
-                      <Text
-                        fontWeight="medium"
-                        fontSize="24px"
-                        lineHeight="30px"
-                      >
-                        {removeDecimal(product.currentPrice)} ₪
-                      </Text>
-                    </Box>
-                  ) : (
-                    <Box flex="1">
-                      <Text fontSize="18px" color="naturalDark">
-                        נמכר
-                      </Text>
-                      <Text
-                        fontWeight="medium"
-                        fontSize="24px"
-                        lineHeight="30px"
-                      >
-                        {product.winningPrice} ₪
-                      </Text>
-                    </Box>
-                  )}
-                </>
-              ) : (
-                <Box flex="1">
-                  <Text
-                    fontSize={{ base: "16px", lg: "18px" }}
-                    color="naturalDark"
-                  >
-                    מחיר
-                  </Text>
-                  <Text
-                    fontWeight="medium"
-                    fontSize={{ base: "18px", lg: "20px", xl: "24px" }}
-                    lineHeight={{ base: "24px", lg: "26px", xl: "30px" }}
-                  >
-                    {removeDecimal(product.price)} ₪
-                  </Text>
-                </Box>
-              )}
-              {!props.myItem && (
-                <>
-                  {product.currentPrice ? (
-                    <>
-                      {product.winningPrice === 0 ? (
-                        <Box>
-                          <Popover
-                            postion="relative"
-                            zIndex={4}
-                            id="offer"
-                            className="addOffer"
-                            placement="top"
-                            isOpen={isOpen}
-                            onOpen={onOpen}
-                            onClose={onClose}
-                            closeOnBlur={false}
-                          >
-                            <PopoverTrigger>
-                              <Button
-                                w={{base: "100px", lg: "120px", xl: "126px"}}
-                                h={{base: "50px", xl: "60px"}}
-                                fontSize="18px"
-                                lineHeight="20px"
-                              >
-                                הצע מחיר
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              w="370px"
-                              border="none"
-                              px="4"
-                              py="6"
-                              pt="12"
-                              boxShadow="md"
-                              borderRadius="16px"
+                  <Box flex="1">
+                    <Text
+                      fontSize={{ base: "16px", lg: "18px" }}
+                      color="naturalDark"
+                    >
+                      מחיר
+                    </Text>
+                    <Text
+                      fontWeight="medium"
+                      fontSize={{ base: product.price >= 10000 ? "16px" : "18px", lg: "20px", xl: "24px" }}
+                      lineHeight={{ base: "24px", lg: "26px", xl: "30px" }}
+                    >
+                      {removeDecimal(product.price)} ₪
+                    </Text>
+                  </Box>
+                )}
+                {!props.myItem && (
+                  <>
+                    {product.openingPrice ? (
+                      <>
+                        {product.winningPrice === 0 ? (
+                          <Box>
+                            <Popover
+                              postion="relative"
+                              zIndex={4}
+                              id="offer"
+                              className="addOffer"
+                              placement="top"
+                              isOpen={isOpen}
+                              onOpen={onOpen}
+                              onClose={onClose}
+                              closeOnBlur={false}
                             >
-                              <PopoverBody border="none">
-                                <ProductBuyCard
-                                  title="אשר את הצעתך"
-                                  value={product.price}
-                                  onClose={onClose}
-                                  addNewOffer={(price) => addNewOffer(price)}
-                                />
-                              </PopoverBody>
-                            </PopoverContent>
-                          </Popover>
-                        </Box>
-                      ) : (
-                        <Box position="relative">
-                          <Button
-                           w={{base: "100px", lg: "120px", xl: "126px"}}
-                           h={{base: "50px", xl: "60px"}}
-                            fontSize="18px"
-                            lineHeight="20px"
-                            isDisabled
-                          >
-                            הצע מחיר
-                          </Button>
-                        </Box>
-                      )}
-                    </>
-                  ) : (
-                    <Box position="relative">
-                      <Button
-                        w={{base: "100px", lg: "120px", xl: "126px"}}
-                        h={{base: "50px", xl: "60px"}}
-                        fontSize="18px"
-                        lineHeight="20px"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = product.openingPrice
-                            ? routes.ProductPageAuction.path.replace(
-                                ":id",
-                                ""
-                              ) + product._id
-                            : routes.ProductPage.path.replace(":id", "") +
-                              product._id;
-                        }}
-                      >
-                        קנו עכשיו
-                      </Button>
-                    </Box>
-                  )}
-                </>
-              )}
-              {props.myItem && (
-                <Box position="relative">
-                  <Button
-                    w="126px"
-                    h="60px"
-                    fontSize="18px"
-                    lineHeight="20px"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.location.href = routes.UpdateProduct.path.replace(
-                        ":id",
-                        product._id
-                      );
-                    }}
-                  >
-                    עדכן מוצר
-                  </Button>
-                </Box>
-              )}
-            </Flex>
+                              <PopoverTrigger>
+                                <Button
+                                  w={{
+                                    base: "100px",
+                                    md: "80px",
+                                    lg: "120px",
+                                    xl: "126px",
+                                  }}
+                                  h={{ base: "50px", xl: "60px" }}
+                                  fontSize={{base: "18px", md: "16px", lg:  "18px"}}
+                                  lineHeight="20px"
+                                >
+                                  הצע מחיר
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                w="370px"
+                                border="none"
+                                px="4"
+                                py="6"
+                                pt="12"
+                                boxShadow="md"
+                                borderRadius="16px"
+                              >
+                                <PopoverBody border="none">
+                                  <ProductBuyCard
+                                    title="אשר את הצעתך"
+                                    value={product.price}
+                                    onClose={onClose}
+                                    addNewOffer={(price) => addNewOffer(price)}
+                                  />
+                                </PopoverBody>
+                              </PopoverContent>
+                            </Popover>
+                          </Box>
+                        ) : (
+                          <Box position="relative">
+                            <Button
+                              w={{ base: "100px", lg: "120px", xl: "126px" }}
+                              h={{ base: "50px", xl: "60px" }}
+                              fontSize="18px"
+                              lineHeight="20px"
+                              isDisabled
+                            >
+                              הצע מחיר
+                            </Button>
+                          </Box>
+                        )}
+                      </>
+                    ) : (
+                      <Box position="relative">
+                        <Button
+                          w={{ base: "100px", lg: "120px", xl: "126px" }}
+                          h={{ base: "50px", xl: "60px" }}
+                          fontSize="18px"
+                          lineHeight="20px"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.location.href = product.openingPrice
+                              ? routes.ProductPageAuction.path.replace(
+                                  ":id",
+                                  ""
+                                ) + product._id
+                              : routes.ProductPage.path.replace(":id", "") +
+                                product._id;
+                          }}
+                        >
+                          קנו עכשיו
+                        </Button>
+                      </Box>
+                    )}
+                  </>
+                )}
+                {props.myItem && (
+                  <Box position="relative">
+                    <Button
+                      w="126px"
+                      h="60px"
+                      fontSize="18px"
+                      lineHeight="20px"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href =
+                          routes.UpdateProduct.path.replace(":id", product._id);
+                      }}
+                    >
+                      עדכן מוצר
+                    </Button>
+                  </Box>
+                )}
+              </Flex>
             </Flex>
           </Box>
           {hover && (
             <Flex
               gap="4"
               pos="absolute"
-              top="9"
+              top={{base: "5", lg: "7"}}
               left="-3"
               w="full"
               alignItems="center"
               justifyContent="space-between"
-              px="6"
+              px={{base: "2", lg: "4"}}
             >
               {product.offers && !props.myItem ? (
                 <Badge>
@@ -399,10 +403,17 @@ export default function CartItemGallery(props) {
             </Flex>
           )}
         </Card>
-        <Box display={{ base: "block", md: "none" }} w="162px">
+        <Box display={{ base: "block", md: "none" }}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          onClick={() =>
+            (window.location.href = product.openingPrice
+              ? routes.ProductPageAuction.path.replace(":id", "") + product._id
+              : routes.ProductPage.path.replace(":id", "") + product._id)
+          }>
           <Image
-            w="full"
-            h="168px"
+            w="100%"
+            aspectRatio="1/1"
             borderRadius="8px"
             objectFit="cover"
             src={images && images[0]}
@@ -426,6 +437,7 @@ export default function CartItemGallery(props) {
             alignItems="center"
           >
             <Text
+            height="36px"
               className="name-text"
               fontSize="14px"
               letterSpacing="-0.01em"
@@ -437,7 +449,7 @@ export default function CartItemGallery(props) {
             >
               {product.title}
             </Text>
-            {product.currentPrice ? (
+            {product.openingPrice ? (
               <>
                 {product.winningPrice === 0 ? (
                   <Box>
@@ -450,7 +462,7 @@ export default function CartItemGallery(props) {
                       הצעה מובילה
                     </Text>
                     <Text fontSize="20px" lineHeight="30px">
-                      ₪ {removeDecimal(product.currentPrice)}
+                     ₪  {removeDecimal(product.currentPrice || product.openingPrice)}
                     </Text>
                   </Box>
                 ) : (
@@ -486,7 +498,7 @@ export default function CartItemGallery(props) {
             )}
             {!props.myItem && (
               <>
-                {product.currentPrice ? (
+                {product.openingPrice ? (
                   <>
                     {product.winningPrice === 0 ? (
                       <Box>
@@ -503,7 +515,8 @@ export default function CartItemGallery(props) {
                         >
                           <PopoverTrigger>
                             <Button
-                              w="162px"
+                              maxW="162px"
+                              w="100%"
                               h="46px"
                               borderRadius="8px"
                               fontSize="16px"
@@ -521,7 +534,7 @@ export default function CartItemGallery(props) {
                             <PopoverBody border="none">
                               <ProductBuyCard
                                 title="אשר את הצעתך"
-                                value={product.price}
+                                value={product.currentPrice || product.openingPrice}
                                 onClose={onClose}
                                 addNewOffer={(price) => addNewOffer(price)}
                               />
@@ -532,7 +545,8 @@ export default function CartItemGallery(props) {
                     ) : (
                       <Box position="relative">
                         <Button
-                          w="162px"
+                          maxW="162px"
+                          w="100%"
                           h="46px"
                           borderRadius="8px"
                           fontSize="16px"
@@ -547,7 +561,8 @@ export default function CartItemGallery(props) {
                 ) : (
                   <Box position="relative">
                     <Button
-                      w="162px"
+                      maxW="162px"
+                      w="100%"
                       h="46px"
                       borderRadius="8px"
                       fontSize="16px"
@@ -568,6 +583,55 @@ export default function CartItemGallery(props) {
               </>
             )}
           </Flex>
+          {hover && (
+            <Flex
+              gap="4"
+              pos="absolute"
+              top={{base: "5", lg: "7"}}
+              left="-3"
+              w="full"
+              alignItems="center"
+              justifyContent="space-between"
+              px={{base: "2", lg: "4"}}
+            >
+              {product.offers && !props.myItem ? (
+                <Badge>
+                  {product.offers ? product.offers.length : 0} הצעות
+                </Badge>
+              ) : (
+                <Box></Box>
+              )}
+              {!props.myItem && (
+                <Tooltip
+                  placement="top"
+                  p="2"
+                  border="1px solid transparent"
+                  borderColor="naturalDark"
+                  borderRadius="10px"
+                  bg="white"
+                  dir="rtl"
+                  color="naturalDarkest"
+                  label={!inWishList ? "הוסף למועדפים" : "הסר מהמועדפים"}
+                >
+                  <IconButton
+                    right="-6"
+                    w="40px"
+                    h="40px"
+                    bg="white"
+                    borderRadius="full"
+                    //color="naturalDark"
+                    fontSize="25"
+                  >
+                    {!inWishList ? (
+                      <HeartIcon onClick={addWish} />
+                    ) : (
+                      <HeartFullIcon onClick={removeWish} />
+                    )}
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Flex>
+          )}
         </Box>
       </>
     );

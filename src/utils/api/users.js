@@ -1,297 +1,153 @@
 import axios from "axios";
 
-//const baseURL = "http://localhost:3001/";
-const baseURL = "https://sale-bid.df.r.appspot.com/";
-const headers = {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-};
+const baseURL = "http://localhost:3001/";
+//const baseURL = "https://sale-bid.df.r.appspot.com/";
+
+const axiosInstance = axios.create({
+  baseURL,
+  withCredentials: true
+});
+// {withCredentials: true, headers: {'Content-Type': 'application/json'}}
 
 const onTokenBroken = () => {
   localStorage.removeItem("token");
   //window.location.href = "/auth/login";
 };
+
+/*const handleError = (error, message) => {
+  console.error(message, error);
+  if (error.response && error.response.status === 401) {
+    // אם יש שגיאת אימות, קרא ל-onTokenBroken
+    onTokenBroken();
+  }
+  throw error;
+};*/
+
 export const login = (email, userName, password) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}login`, {
-        email,
-        userName,
-        password,
-      })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.post('/login', { email, userName, password })
+    .then(res => {console.log(res); return res.data})
+    .catch(err => {
+      //onTokenBroken();
+      throw err;
+    });
 };
 
 export const checkIfUserExists = (input) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}login-no-password`, { input })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.patch('login-no-password', { input })
+    .then(res => res.data)
+    .catch(err => {
+      throw err;
+    });
 };
 
 export const sendEmailAuth = (email) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}send_code`, { email })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.patch('send_code', { email })
+    .then(res => res.data)
+    .catch(err => {
+      throw err;
+    });
 };
 
 export const checkEmailAuth = (email, code) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}valid_code`, { email, code })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.patch('valid_code', { email, code })
+    .then(res => res.data)
+    .catch(err => {
+      throw err;
+    });
 };
 
 export const updatePasswordByEmail = (email, newPassword) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}update-password/email`, { email, newPassword })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.patch('update-password/email', { email, newPassword })
+    .then(res => res.data)
+    .catch(err => {
+      throw err;
+    });
 };
 
-export const signup = (
-  email,
-  firstName,
-  lastName,
-  userName,
-  password,
-  phoneNumber,
-  country,
-  city,
-  street,
-  buildingNumber,
-  floor,
-  apartmentNumber
-) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(`${baseURL}create-user`, {
-        email,
-        firstName,
-        lastName,
-        userName,
-        country,
-        city,
-        street,
-        buildingNumber,
-        floor,
-        apartmentNumber,
-        password,
-        phoneNumber,
-      })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-        onTokenBroken();
-        reject(err);
-      });
-  });
+export const signup = (userData) => {
+  return axiosInstance.post('create-user', userData)
+    .then(res => res.data)
+    .catch(err => {
+      console.log(err);
+      onTokenBroken();
+      throw err;
+    });
 };
 
 export const getUser = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}user`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get('user')
+    .then(res => res.data)
+    .catch(err => {
+      throw err;
+    });
 };
 
 export const getUserProfile = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}user-profile`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get('user-profile')
+    .then(res => res.data)
+    .catch(err => {
+      throw err;
+    });
 };
 
-export const updateUser = (
-  email,
-  firstName,
-  lastName,
-  userName,
-  password,
-  phoneNumber,
-  country,
-  city,
-  street,
-  buildingNumber,
-  floor,
-  apartmentNumber
-) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(
-        `${baseURL}update-user`,
-        {
-          email,
-          firstName,
-          lastName,
-          userName,
-          password,
-          phoneNumber,
-          country,
-          city,
-          street,
-          buildingNumber,
-          floor,
-          apartmentNumber,
-        },
-        headers
-      )
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        // onTokenBroken();
-        reject(err);
-      });
-  });
+export const updateUser = (userData) => {
+  return axiosInstance.patch('update-user', userData)
+    .then(res => res.data)
+    .catch(err => {
+      throw err;
+    });
 };
 
 export const updatePassword = (oldPassword, newPassword) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}update-password`, { oldPassword, newPassword }, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.patch('update-password', { oldPassword, newPassword })
+    .then(res => res.data)
+    .catch(err => {
+      throw err;
+    });
 };
 
 export const updateProfileImage = (image) => {
   const formData = new FormData();
   formData.append("image", image);
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}update-profileImage`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.patch('update-profileImage', formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  })
+    .then(res => res.data)
+    .catch(err => {
+      throw err;
+    });
 };
 
 export const deleteUser = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}user`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.delete('user')
+    .then(res => res.data)
+    .catch(err => {
+      throw err;
+    });
 };
 
 export const googleLogin = (email) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}google-login`, {
-        email,
-      })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.patch('google-login', { email })
+    .then(res => res.data)
+    .catch(err => {
+      onTokenBroken();
+      throw err;
+    });
 };
 
-
-export const googleSignin = (
-  email,
-  firstName,
-  lastName,
-  userName,
-  password,
-  profileImage
-) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(`${baseURL}create-user`, {
-        email,
-        firstName,
-        lastName,
-        userName,
-        password,
-        profileImage
-      })
-      .then((res) => {
-        console.log(res)
-        resolve(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-        if(err.response.data.error === "user already exists")
-          resolve("user already exists")
-        reject(err);
-      });
-  });
+export const googleSignin = (userData) => {
+  return axiosInstance.post('create-user', userData)
+    .then(res => {
+      console.log(res);
+      return res.data;
+    })
+    .catch(err => {
+      console.log(err);
+      if (err.response && err.response.data.error === "user already exists") {
+        return "user already exists";
+      }
+      throw err;
+    });
 };

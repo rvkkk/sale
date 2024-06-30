@@ -72,18 +72,22 @@ import Button from "../Button";
 import { useState, useEffect } from "react";
 import CountrySelect from "../CountrySelect";
 import { getTopCategories } from "../../utils/api/categories";
+import { useAuth } from "../Contexts/AuthContext";
+import { useCart } from "../Contexts/CartContext";
 
 export default function NavBar({ withSidebar, logo, change }) {
   const [query, setQuery] = useState("");
-  const [cart, setCart] = useState({});
-  const [products, setProducts] = useState([]);
+ // const [products, setProducts] = useState([]);
   const [fetchedUser, setFetchedUser] = useState(false);
   const [userLogged, setUserLogged] = useState(false);
-  const [token, setToken] = useState(window.localStorage.getItem("token"));
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [hideOnScroll, setHideOnScroll] = useState(false);
   const [fixedLinks, setFixedLinks] = useState(false);
-
+  const { isAuthenticated } = useAuth();
+  const { cart,
+    updateProductInCart,
+    removeProductFromCart,
+    deleteMyCart } = useCart();
   const [user, setUser] = useState({
     userName: "Sale Bid",
     profileImage: "",
@@ -108,7 +112,6 @@ export default function NavBar({ withSidebar, logo, change }) {
           setUserLogged(true);
         })
         .catch((err) => {
-          setToken(null);
           setUserLogged(false);
           setFetchedUser(true);
         });
@@ -116,12 +119,11 @@ export default function NavBar({ withSidebar, logo, change }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
     setUserLogged(false);
     window.location.href = "/";
   };
-  useEffect(() => {
-    console.log(change);
+  /*  useEffect(() => {
+
     getMyCart();
   }, [change]);
 
@@ -163,7 +165,7 @@ export default function NavBar({ withSidebar, logo, change }) {
     // כאן תוכל לטפל בסגירת החיבור
   });*/
 
-  const updateAmount = (product, newAmount, amount) => {
+  /* const updateAmount = (product, newAmount, amount) => {
     if (token === null)
       addToCart({ product: product, amount: newAmount - amount })
         .then((res) => {
@@ -234,13 +236,12 @@ export default function NavBar({ withSidebar, logo, change }) {
         .catch((err) => {
           console.log(err);
         });
-  };
+  };*/
 
   useEffect(() => {
     setQuery(query);
-    getMyCart();
-    if (token !== null) getUser();
-  }, [query, token]);
+    if (isAuthenticated) getUser();
+  }, [query, isAuthenticated]);
 
   useEffect(() => {
     let prevScrollY = window.pageYOffset;
@@ -268,7 +269,7 @@ export default function NavBar({ withSidebar, logo, change }) {
     };
   }, []);
 
-  const getMyCart = () => {
+  /* const getMyCart = () => {
     if (token !== null) {
       getUserCart()
         .then((res) => {
@@ -306,7 +307,7 @@ export default function NavBar({ withSidebar, logo, change }) {
           console.log(err);
         });
   };
-
+*/
   return (
     <>
       <Box w="100%" display={{ base: "none", lg: "grid" }}>
@@ -434,9 +435,9 @@ export default function NavBar({ withSidebar, logo, change }) {
                           <Spacer h="10px" />
                           <Box overflow="auto" className="slider-container">
                             <Slider {...settings}>
-                              {products && (
+                              {cart.products && (
                                 <>
-                                  {products.map((p, key) => (
+                                  {cart.products.map((p, key) => (
                                     <React.Fragment key={key}>
                                       <NavCartListItem
                                         title={p.product.title}
@@ -445,7 +446,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                                         amount={p.amount}
                                         quantity={p.product.quantity}
                                         onChangeAmount={(amount) =>
-                                          updateAmount(
+                                          updateProductInCart(
                                             p.product,
                                             amount,
                                             p.amount
@@ -558,7 +559,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                       borderRadius="8px"
                           />*/}
                   </MenuButton>
-                  {token !== null ? (
+                  {isAuthenticated ? (
                     <MenuList
                       dir="rtl"
                       w="223px"
@@ -599,7 +600,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                         icon={BillingIcon}
                         name="כתובת למשלוח"
                       />
-                   {/*} <MenuItemComponent
+                      {/*} <MenuItemComponent
                         path={
                           userLogged
                             ? routes.UserSettingsDeliveryTraker.path
@@ -672,7 +673,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                 </Menu>
               </Flex>
 
-             {/*} <Menu direction="rtl">
+              {/*} <Menu direction="rtl">
                 <MenuButton
                   role="button"
                   aria-label="show website details"
@@ -785,7 +786,7 @@ export default function NavBar({ withSidebar, logo, change }) {
               >
                 מכירות רגילות
               </ChakraButton>
-             {/*} <ChakraButton
+              {/*} <ChakraButton
                 variant="link"
                 px="4"
                 textColor="primary"
@@ -814,8 +815,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                 bg="transparent"
                 aria-label="link to sale bid"
                 onClick={() =>
-                  (window.location.href =
-                    routes.Category.path.replace(":category", "") + "food")
+                  (window.location.href = routes.AuctionProducts.path)
                 }
                 role="button"
               >
@@ -968,7 +968,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                   <UserMobileIcon />
                 )}
               </MenuButton>
-              {token !== null ? (
+              {isAuthenticated ? (
                 <MenuList
                   dir="rtl"
                   w="223px"
@@ -1009,7 +1009,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                     icon={BillingIcon}
                     name="כתובת למשלוח"
                   />
-               {/*} <MenuItemComponent
+                  {/*} <MenuItemComponent
                     path={
                       userLogged
                         ? routes.UserSettingsDeliveryTraker.path
@@ -1148,7 +1148,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                             העגלה שלי
                           </Text>
                           <Text color="naturalDarkest">
-                            ({products.length})
+                            ({cart.products && cart.products.length})
                           </Text>
                         </Flex>
 
@@ -1168,9 +1168,9 @@ export default function NavBar({ withSidebar, logo, change }) {
                       <Spacer h="10px" />
                       <Box overflow="auto" className="slider-container">
                         <Slider {...settings}>
-                          {products && (
+                          {cart.products && (
                             <>
-                              {products.map((p, key) => (
+                              {cart.products.map((p, key) => (
                                 <React.Fragment key={key}>
                                   <NavCartListItem
                                     title={p.product.title}
@@ -1179,7 +1179,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                                     amount={p.amount}
                                     quantity={p.product.quantity}
                                     onChangeAmount={(amount) =>
-                                      updateAmount(p.product, amount, p.amount)
+                                      updateProductInCart(p.product, amount, p.amount)
                                     }
                                     onDelete={() => {
                                       const a = window.confirm(
@@ -1348,11 +1348,8 @@ export default function NavBar({ withSidebar, logo, change }) {
                         bg="naturalLightest"
                         aria-label="link to sale bids"
                         role="button"
-                        onClick={
-                          () =>
-                            (window.location.href =
-                              routes.Category.path.replace(":category", "") +
-                              "food") //?type=auctions"
+                        onClick={() =>
+                          (window.location.href = routes.AuctionProducts.path)
                         }
                       >
                         מכירות פומביות
@@ -1427,12 +1424,10 @@ export default function NavBar({ withSidebar, logo, change }) {
           </Flex>
         </Flex>
         <SearchComponent
-                value={query}
-                onChange={(e) => setQuery(e)}
-                onClick={() =>
-                  (window.location.href = "/category?query=" + query)
-                }
-              />
+          value={query}
+          onChange={(e) => setQuery(e)}
+          onClick={() => (window.location.href = "/category?query=" + query)}
+        />
       </Flex>
     </>
   );
@@ -1500,12 +1495,17 @@ const MenuItemCategory = () => {
           {topCategories[0] &&
             topCategories.slice(0, 5).map((category, index) => (
               <Flex flexDir="column" gap="10px" w="110px" key={index}>
-                <Flex dir="rtl" gap="3px" alignItems="center" onClick={() => {
+                <Flex
+                  dir="rtl"
+                  gap="3px"
+                  alignItems="center"
+                  onClick={() => {
                     window.location.href = `${routes.Categories.path.replace(
                       ":category",
                       ""
                     )}${category.title}`;
-                  }}>
+                  }}
+                >
                   <Text fontSize="14px" fontWeight="semibold">
                     {category.name}
                   </Text>
@@ -1552,12 +1552,17 @@ const MenuItemCategory = () => {
           {topCategories[0] &&
             topCategories.slice(5, 10).map((category, index) => (
               <Flex flexDir="column" gap="10px" w="110px" key={index}>
-                <Flex dir="rtl" gap="3px" alignItems="center" onClick={() => {
+                <Flex
+                  dir="rtl"
+                  gap="3px"
+                  alignItems="center"
+                  onClick={() => {
                     window.location.href = `${routes.Categories.path.replace(
                       ":category",
                       ""
                     )}${category.title}`;
-                  }}>
+                  }}
+                >
                   <Text fontSize="14px" fontWeight="semibold">
                     {category.name}
                   </Text>

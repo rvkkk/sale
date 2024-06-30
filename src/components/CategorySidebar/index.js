@@ -142,7 +142,7 @@ export default function CategorySidebar(props) {
                     {sliderValue[1]} ₪
                   </Badge>
                 </Flex>
-                <Box w={{base: "278px", md: "168px", xl: "250px"}} h="24px" mx="auto">
+                <Box w={{base: "278px", md: "158px", xl: "250px"}} h="24px" mx="auto">
                   <RangeSlider
                     ariaLabel={["min", "max"]}
                     size="lg"

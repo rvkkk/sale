@@ -49,6 +49,20 @@ export const addCart = (payload) => {
   });
 };
 
+export const addLocalCart = (payload) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`${baseURL}carts-add-local`, payload, headers)
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        //onTokenBroken();
+        reject(err);
+      });
+  });
+};
+
 export const updateCart = (payload) => {
   return new Promise((resolve, reject) => {
     axios

@@ -2,96 +2,65 @@ import axios from "axios";
 
 const baseURL = "https://sale-bid.df.r.appspot.com/";
 
-const headers = {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-};
+const axiosInstance = axios.create({
+  baseURL,
+  withCredentials: true
+});
 
 export const getUserWishList = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}wish-lists-user`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
-};
-
-export const checkIfInWishList = (productId) => {
-  getUserWishList()
-    .then((res) => {
-      if (res.wishList.products.length >= 1) {
-        const index = res.wishList.products.findIndex(
-          (p) => p.product.id === productId
-        );
-        return index !== -1;
-      } else {
-        return false;
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      return false;
+  return axiosInstance.get('wish-lists-user')
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching user wish list:", err);
+      throw err;
     });
 };
 
+export const checkIfInWishList = async (productId) => {
+  try {
+    const res = await getUserWishList();
+    if (res.wishList && res.wishList.products && res.wishList.products.length >= 1) {
+      return res.wishList.products.some(p => p.product.id === productId);
+    }
+    return false;
+  } catch (err) {
+    console.error("Error checking if product is in wish list:", err);
+    return false;
+  }
+};
+
 export const deleteWishList = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}wish-lists/${id}`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.delete(`wish-lists/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error deleting wish list:", err);
+      throw err;
+    });
 };
 
 export const deleteFromWishList = (productId) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}wish-lists-remove/${productId}`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.delete(`wish-lists-remove/${productId}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error deleting product from wish list:", err);
+      throw err;
+    });
 };
 
 export const addNewWish = (payload) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(`${baseURL}wish-lists`, payload, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.post('wish-lists', payload)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error adding new wish:", err);
+      throw err;
+    });
 };
 
 export const updateWishList = (payload) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}wish-lists/`, payload, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.patch('wish-lists', payload)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error updating wish list:", err);
+      throw err;
+    });
 };

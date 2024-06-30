@@ -2,106 +2,70 @@ import axios from "axios";
 
 const baseURL = "https://sale-bid.df.r.appspot.com/";
 
-const headers = {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-};
+const axiosInstance = axios.create({
+  baseURL,
+  withCredentials: true
+});
 
 export const getOrdersTracking = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}orderTrackings`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get('orderTrackings')
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching orders tracking:", err);
+      throw err;
+    });
 };
 
 export const getOrderTracking = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}orderTrackings/${id}`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get(`orderTrackings/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching order tracking:", err);
+      throw err;
+    });
 };
 
 export const getOrderOrdersTracking = (orderId) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}orderTrackings-order/${orderId}`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get(`orderTrackings-order/${orderId}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching order's order tracking:", err);
+      throw err;
+    });
 };
 
 export const addOrderTracking = (orderId, payload) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(`${baseURL}orderTrackings-order/${orderId}`, payload, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.post(`orderTrackings-order/${orderId}`, payload)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error adding order tracking:", err);
+      throw err;
+    });
 };
 
 export const updateOrderTracking = (id, payload) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(`${baseURL}orderTrackings/${id}`, payload, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.patch(`orderTrackings/${id}`, payload)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error updating order tracking:", err);
+      throw err;
+    });
 };
 
 export const deleteOrderTracking = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}orderTrackings/${id}`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.delete(`orderTrackings/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error deleting order tracking:", err);
+      throw err;
+    });
 };
 
 export const deleteOrderOTracking = (orderId) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}orderTrackings-order/${orderId}`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.delete(`orderTrackings-order/${orderId}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error deleting order's order tracking:", err);
+      throw err;
+    });
 };

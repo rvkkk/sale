@@ -10,7 +10,7 @@ import Input from "../Input";
 import TextArea from "../TextArea";
 import { PaperClipIcon, SendIcon, StarEmptyIcon, StarFullIcon, StarHalfIcon } from "../Icons";
 
-export default function Tab2Component() {
+export default function Tab2Component({productId}) {
   const [reviews, setReviews] = useState([]);
   const [allReviews, setAllReviews] = useState([]);
   const [showAddR, setShowAddR] = useState(false);
@@ -45,7 +45,7 @@ export default function Tab2Component() {
   };
 
   useEffect(() => {
-    getProductReviews(window.location.href.split("/").pop().split("?")[0])
+    getProductReviews(productId)
       .then((res) => {
         setAllReviews(res.reviews);
         setReviews(res.reviews.slice(0, 10));
