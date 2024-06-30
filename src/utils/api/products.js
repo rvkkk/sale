@@ -1,295 +1,134 @@
 import axios from "axios";
 
-//const baseURL = "http://localhost:3001/";
-const baseURL = "https://sale-bid.df.r.appspot.com/";
-const headers = {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
+const baseURL = "http://localhost:3001/"//"https://sale-bid.df.r.appspot.com/";
+
+const axiosInstance = axios.create({
+  baseURL,
+  withCredentials: true
+});
+
+const createFormData = (data) => {
+  const formData = new FormData();
+  Object.keys(data).forEach(key => {
+    if (Array.isArray(data[key])) {
+      data[key].forEach(item => formData.append(key, item));
+    } else if (key === 'additional-fields') {
+      const json = JSON.stringify(data[key]);
+      const blob = new Blob([json]);
+      formData.append(key, blob);
+    } else {
+      formData.append(key, data[key]);
+    }
+  });
+  return formData;
 };
 
 export const getProduct = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}products/${id}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get(`products/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching product:", err);
+      throw err;
+    });
 };
 
 export const getUserProducts = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}products-user`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get('products-user')
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching user products:", err);
+      throw err;
+    });
 };
 
 export const addProducts = (userName, file) => {
-  return new Promise((resolve, reject) => {
-    const formData = new FormData();
-    formData.append("userName", userName);
-    formData.append("file", file);
-    axios
-      .post(`${baseURL}products-many`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  const formData = new FormData();
+  formData.append("userName", userName);
+  formData.append("file", file);
+  return axiosInstance.post('products-many', formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  })
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error adding products:", err);
+      throw err;
+    });
 };
 
-export const addProduct = (
-  title,
-  barcode,
-  price,
-  priceBefore,
-  warranty,
-  category,
-  description,
-  additionalInfo,
-  properties,
-  notes,
-  kitInclude,
-  quantity,
-  deliveryTime,
-  modelName,
-  specification,
-  additionalFields,
-  images,
-  status,
-  fragile
-  //YouTubeLink,
-) => {
-  return new Promise(async(resolve, reject) => {
-   const json = JSON.stringify(additionalFields);
-    const additionalBlob = new Blob([json]);
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("main-barcode", barcode);
-    formData.append("price", price);
-    formData.append("price-before-discount", priceBefore);
-    formData.append("warranty", warranty);
-    formData.append("category", category);
-    formData.append("description", description);
-    formData.append("additional-information", additionalInfo);
-    formData.append("properties", properties);
-    formData.append("notes", notes);
-    formData.append("kit-include", kitInclude);
-    formData.append("quantity", quantity);
-    formData.append("delivery-time", deliveryTime);
-    formData.append("model-name", modelName);
-    formData.append("specification", specification);
-    formData.append("additional-fields", additionalBlob);
-    for (const image of images) {
-      formData.append("images", image);
-    }
-    formData.append("fragile", fragile);
-    formData.append("status", status);
-    formData.append("pin", false);
-    axios
-      .post(`${baseURL}products`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+export const addProduct = (productData) => {
+  const formData = createFormData(productData);
+  return axiosInstance.post('products', formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  })
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error adding product:", err);
+      throw err;
+    });
 };
 
-export const updateProduct = (
-  id,
-  title,
-  barcode,
-  price,
-  priceBefore,
-  warranty,
-  category,
-  description,
-  additionalInfo,
-  properties,
-  notes,
-  kitInclude,
-  quantity,
-  deliveryTime,
-  modelName,
-  specification,
-  additionalFields,
-  images,
-  status,
-  fragile
-) => {
-  return new Promise((resolve, reject) => {
-    const json = JSON.stringify(additionalFields);
-    const additionalBlob = new Blob([json]);
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("main-barcode", barcode);
-    formData.append("price", price);
-    formData.append("price-before-discount", priceBefore);
-    formData.append("warranty", warranty);
-    formData.append("category", category);
-    formData.append("description", description);
-    formData.append("additional-information", additionalInfo);
-    formData.append("properties", properties);
-    formData.append("notes", notes);
-    formData.append("kit-include", kitInclude);
-    formData.append("quantity", quantity);
-    formData.append("delivery-time", deliveryTime);
-    formData.append("model-name", modelName);
-    formData.append("specification", specification);
-    formData.append("additional-fields", additionalBlob);
-    for (const image of images) {
-      formData.append("images", image);
-    }
-    formData.append("fragile", fragile);
-    formData.append("status", status);
-    axios
-      .patch(`${baseURL}products/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+export const updateProduct = (id, productData) => {
+  const formData = createFormData(productData);
+  return axiosInstance.patch(`products/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  })
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error updating product:", err);
+      throw err;
+    });
 };
 
 export const deleteProduct = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}products/${id}`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.delete(`products/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error deleting product:", err);
+      throw err;
+    });
 };
 
 export const getProducts = (page = 1, limit = 30) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}products?page=${page}&limit=${limit}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get(`products?page=${page}&limit=${limit}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching products:", err);
+      throw err;
+    });
 };
 
 export const getProductsByCategory = (category, page = 1, limit = 30) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(
-        `${baseURL}products-category/${category}?page=${page}&limit=${limit}`
-      )
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get(`products-category/${category}?page=${page}&limit=${limit}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching products by category:", err);
+      throw err;
+    });
 };
 
 export const getProductsByMainCategory = (category, page = 1, limit = 30) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(
-        `${baseURL}products-main-category/${category}?page=${page}&limit=${limit}`
-      )
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get(`products-main-category/${category}?page=${page}&limit=${limit}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching products by main category:", err);
+      throw err;
+    });
 };
 
 export const getProductsByLetters = (letters, page = 1, limit = 10) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(
-        `${baseURL}products-by-letters?query=${letters}&page=${page}&limit=${limit}`
-      )
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get(`products-by-letters?query=${letters}&page=${page}&limit=${limit}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching products by letters:", err);
+      throw err;
+    });
 };
 
-export const searchProducts = (
-  category,
-  filters,
-  page,
-  limit,
-  minPrice,
-  maxPrice,
-  sortBy
-) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}search-products`, {
-        category,
-        filters,
-        page,
-        limit,
-        minPrice,
-        maxPrice,
-        sortBy,
-      })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+export const searchProducts = (searchData) => {
+  return axiosInstance.patch('search-products', searchData)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error searching products:", err);
+      throw err;
+    });
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy } from "react";
 import ReactStars from "react-rating-stars-component";
 import { AiFillExclamationCircle } from "react-icons/ai";
 import { GrLocation } from "react-icons/gr";
@@ -53,6 +53,8 @@ import {
 } from "../components/Icons";
 import ProductAccordings from "../components/ProductAccordings";
 import TopProducts from "../components/LoadingProducts";
+import { useAuth } from "../components/Contexts/AuthContext";
+import { useCart } from "../components/Contexts/CartContext";
 
 export default function ProductPage() {
   const [product, setProduct] = useState({});
@@ -64,22 +66,35 @@ export default function ProductPage() {
   //const [model, setModel] = useState("1");
   const [inWishList, setInWishList] = useState(false);
   const [showFullText, setShowFullText] = useState(false);
-  const token = window.localStorage.getItem("token");
   const [isTextShort, setIsTextShort] = useState(true);
-  const [change, setChange] = useState("");
-  const [number, setNumber] = useState(1);
+ // const [change, setChange] = useState("");
+  ///const [number, setNumber] = useState(1);
+  const { isAuthenticated } = useAuth();
+  const { cart,
+    addProductToCart,
+    updateProductInCart,
+    removeProductFromCart,
+    deleteMyCart } = useCart();
 
-  const tabs = [
-    {
-      name: "מידע נוסף",
-      component: <Tab1Component additionalInfo={additionalInfo} />,
-    },
-    { name: "המלצות", component: <Tab2Component /> },
-    {
-      name: "משלוחים והחזרות",
-      component: <Tab3Component shippingCost={product["shipping-cost"]} deliveryTime={product["delivery-time"]}/>,
-    },
-  ];
+const LazyTab2Component = lazy(() => import("../components/ProductTab1/Tab2Component"));
+
+const tabs = [
+  {
+    name: "מידע נוסף",
+    component: Tab1Component,
+    props: { additionalInfo },
+  },
+  { 
+    name: "המלצות", 
+    component: LazyTab2Component,
+    props: { productId: product.id },
+  },
+  {
+    name: "משלוחים והחזרות",
+    component: Tab3Component,
+    props: { shippingCost: product["shipping-cost"], deliveryTime: product["delivery-time"] },
+  },
+];
 
   useEffect(() => {
     const textElement = document.getElementById("text-element");
@@ -114,7 +129,7 @@ export default function ProductPage() {
       socket.close();
     };*/
 
-  const addProductToCart = () => {
+ /* const addProductToCart = () => {
     if (token === null)
       addToCart({
         product: {
@@ -178,10 +193,10 @@ export default function ProductPage() {
         .catch((err) => {
           console.log(err);
         });
-  };
+  };*/
 
   const addWish = () => {
-    if (token === null)
+    if (!isAuthenticated)
       addToWishList({
         product: {
           id: product.id,
@@ -218,7 +233,7 @@ export default function ProductPage() {
   };
 
   const removeWish = () => {
-    if (token === null)
+    if (!isAuthenticated)
       removeFromWishList({
         productId: product.id,
       })
@@ -293,7 +308,7 @@ export default function ProductPage() {
   }, [product]);
 
   useEffect(() => {
-    if (token === null)
+    if (!isAuthenticated)
       if (checkIfProductInWishList({ productId: product.id }))
         setInWishList(true);
       else setInWishList(false);
@@ -312,7 +327,7 @@ export default function ProductPage() {
           console.log(err);
           return false;
         });
-  }, [product, token]);
+  }, [product, isAuthenticated]);
 
   const breadcrumb = product.title && [
     { name: "דף הבית", href: routes.HOME.path },
@@ -333,7 +348,7 @@ export default function ProductPage() {
   ];
 
   return (
-    <Layout breadcrumb={breadcrumb} z-index="1" change={change}>
+    <Layout breadcrumb={breadcrumb} z-index="1">
       {loading ? (
         <Loader />
       ) : (
@@ -679,7 +694,7 @@ export default function ProductPage() {
                               w={{ md: "140px", lg: "180px", xl: "219.5px" }}
                               borderRadius="12px"
                               fontWeight="bold"
-                              onClick={() => removeProductFromCart()}
+                              onClick={() => removeProductFromCart(product.id)}
                             >
                               <CartIcon4 />
                               הסירו מהעגלה
@@ -695,7 +710,7 @@ export default function ProductPage() {
                               w={{ md: "140px", lg: "180px", xl: "219.5px" }}
                               borderRadius="12px"
                               fontWeight="bold"
-                              onClick={() => addProductToCart()}
+                              onClick={() => addProductToCart(product, amountToBuy)}
                             >
                               <CartIcon4 />
                               הוסיפו לעגלה
@@ -1127,7 +1142,7 @@ export default function ProductPage() {
                         //color={!inWishList ? "naturalDark" : "primary"}
                         //fontSize="30px"
                         icon={<CartBigIcon2 />}
-                        onClick={() => addProductToCart()}
+                        onClick={() => addProductToCart(product, amountToBuy)}
                       />
                       <IconButton
                         w="60px"

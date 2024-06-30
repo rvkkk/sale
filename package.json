@@ -46,6 +46,7 @@
     "stylis-plugin-rtl": "^2.1.1",
     "swiper": "^10.0.0",
     "transliteration": "^2.3.5",
+    "vite": "^5.3.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

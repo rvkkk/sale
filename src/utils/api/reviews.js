@@ -1,110 +1,62 @@
 import axios from "axios";
 
 const baseURL = "https://sale-bid.df.r.appspot.com/";
-const headers = {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-};
+
+const axiosInstance = axios.create({
+  baseURL,
+  withCredentials: true
+});
 
 export const getReview = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}reviews/${id}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get(`reviews/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching review:", err);
+      throw err;
+    });
 };
 
 export const getUserReviews = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}reviews-user`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get('reviews-user')
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching user reviews:", err);
+      throw err;
+    });
 };
 
 export const getProductReviews = (productId) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}reviews-product/${productId}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        console.log(err)
-        reject(err);
-      });
-  });
+  return axiosInstance.get(`reviews-product/${productId}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching product reviews:", err);
+      throw err;
+    });
 };
 
-export const addReview = (productId, title, description, score, images) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(
-        `${baseURL}reviews/${productId}`,
-        {
-          title,
-          description,
-          score,
-          images
-        },
-        headers
-      )
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+export const addReview = (productId, reviewData) => {
+  return axiosInstance.post(`reviews/${productId}`, reviewData)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error adding review:", err);
+      throw err;
+    });
 };
 
-export const updateReview = (id, title, description, score) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(
-        `${baseURL}reviews/${id}`,
-        {
-          title,
-          description,
-          score,
-        },
-        headers
-      )
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+export const updateReview = (id, reviewData) => {
+  return axiosInstance.patch(`reviews/${id}`, reviewData)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error updating review:", err);
+      throw err;
+    });
 };
 
 export const deleteReview = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}reviews/${id}`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.delete(`reviews/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error deleting review:", err);
+      throw err;
+    });
 };

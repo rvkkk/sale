@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { FaListUl } from "react-icons/fa";
 import { RxDashboard } from "react-icons/rx";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import CategorySidebar from "../components/CategorySidebar";
 import Layout from "../components/Layout";
 import CartListItem from "../components/CartListItem";
@@ -41,11 +41,12 @@ import Loader from "../components/Loader";
 import { routes } from "../routes";
 import { CategoryIcon, Filter2Icon, SortIcon } from "../components/Icons";
 import { getSubcategory } from "../utils/api/subcategories";
+import { extendTheme, createBreakpoints } from "@chakra-ui/react";
 
 export default function Category() {
   const [loading, setLoading] = useState(true);
   const [isList, setIsList] = useState(true);
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([{}]);
   const [pages, setPages] = useState(0);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState({});
@@ -54,6 +55,8 @@ export default function Category() {
   const [sortBy, setSortBy] = useState("newest");
   const [minPrice, setMinPrice] = useState(100);
   const [maxPrice, setMaxPrice] = useState(2000);
+ // const sortedPriceUp = useMemo(() => sortPriceUp(products), [products]);
+
 
   const breadcrumb = category.name && [
     { name: "דף הבית", href: routes.HOME.path },
@@ -66,6 +69,17 @@ export default function Category() {
     },
     { name: category.name, href: "#" },
   ];
+
+  const theme = extendTheme({
+    breakpoints: {
+      sm: '30em',
+      md: '48em',
+      lg: '62em',
+      xl: '80em',
+      '2xl': '96em',
+      custom: '62.5em', // 1000px / 16 = 62.5em
+    },
+  });
 
   const onBackPage = () => {
     if (currentPage > 1) {
@@ -112,7 +126,12 @@ export default function Category() {
     searchProducts(categoryName, tags, 1, 21, minPrice, maxPrice, sortBy)
       .then((res) => {
         console.log(res);
-        setProducts(res.products.products);
+        const products = res.products.products;
+    setProducts(products);
+        const sortedProducts = sortPriceUp(products);
+        console.log(sortedProducts)
+        setMinPrice(sortedProducts[0]?.price || 0);
+    setMaxPrice(sortedProducts[sortedProducts.length - 1]?.price || 0);
         setPages(res.products.pages);
         //setLoading(false);
       })
@@ -153,7 +172,7 @@ export default function Category() {
             //mt="30px"
             gap="10"
             dir="rtl"
-
+            w="100%"
             // mx={["16px", "32px", "50px", "100px", "200px"]}
           >
             <Box>
@@ -359,13 +378,13 @@ export default function Category() {
               {isList ? (
                 <Flex
                   w={{ md: "100%" }}
-                  minW="500px"
+                  //minW="500px"
                   maxW="1154px"
                   flexDirection="column"
                   gap="6"
                   mt="8"
                 >
-                  {products[0] &&
+                  {(products[0] && products[0].title) &&
                     products.map((item) => {
                       return <CartListItem data={item} />;
                     })}
@@ -373,7 +392,7 @@ export default function Category() {
               ) : (
                 <Grid
                   w={{ md: "100%" }}
-                  minW="500px"
+                  //minW="500px"
                   maxW="1154px"
                   gridTemplateColumns={{
                     md: "repeat(2, 1fr)",
@@ -382,7 +401,7 @@ export default function Category() {
                   gap="6"
                   mt="8"
                 >
-                  {products[0] &&
+                  {(products[0] && products[0].title) &&
                     products.map((item) => {
                       return <CartGalleryItem data={item} />;
                     })}
@@ -390,7 +409,7 @@ export default function Category() {
               )}
 
               <Spacer h="20" />
-              {products.length > 0 && (
+              {(products[0] && products[0].title)  && (
                 <Flex justifyContent="center">
                   <Pagination
                     currentPage={currentPage}
@@ -405,7 +424,7 @@ export default function Category() {
           </Flex>
           <Flex flexDir="column" display={{ base: "flex", md: "none" }}>
             <Flex
-              w={{ base: "336px", sm: "460px" }}
+              w="336px"
               dir="rtl"
               mx="auto"
               justifyContent="space-between"
@@ -674,12 +693,14 @@ export default function Category() {
             )}
 
             <Grid
-              gridTemplateColumns="repeat(2, 1fr)"
+              gridTemplateColumns={{base: "repeat(2, 1fr)", sm : "repeat(3, 1fr)"}}
               rowGap="30px"
               columnGap="3"
               my="8"
+              mx="20px"
+              justifyContent="center"
             >
-              {products[0] &&
+              {(products[0] && products[0].title) &&
                 products.map((item) => {
                   return <CartGalleryItem data={item} />;
                 })}

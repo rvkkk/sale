@@ -111,11 +111,11 @@ export default function ProductTimeClock(props) {
                 fontSize="18px"
                 letterSpacing="0.02em"
               >
-                {`00d : 00h : 00m : ${
+                {`00:00:00:${
                   timeLeft.seconds < 10
                     ? "0" + timeLeft.seconds
                     : timeLeft.seconds
-                }s`}
+                }`}
               </Text>
             ) : (
               <Text
@@ -126,17 +126,17 @@ export default function ProductTimeClock(props) {
               >
                 {`${
                   timeLeft.days < 10 ? "0" + timeLeft.days : timeLeft.days
-                }d :${
+                }:${
                   timeLeft.hours < 10 ? "0" + timeLeft.hours : timeLeft.hours
-                }h : ${
+                }:${
                   timeLeft.minutes < 10
                     ? "0" + timeLeft.minutes
                     : timeLeft.minutes
-                }m : ${
+                }:${
                   timeLeft.seconds < 10
                     ? "0" + timeLeft.seconds
                     : timeLeft.seconds
-                }s`}
+                }`}
               </Text>
             )}
           </Flex>
@@ -145,7 +145,7 @@ export default function ProductTimeClock(props) {
       <Card
         display={{ base: "flex", md: "none" }}
         dir="rtl"
-        w="129px"
+        w="120px"
         h="30px"
         borderRadius="6px"
         border="0.5px solid"
@@ -191,11 +191,11 @@ export default function ProductTimeClock(props) {
                 fontSize="14px"
                 letterSpacing="0.02em"
               >
-                {`00d : 00h : 00m : ${
+                {`00:00:00:${
                   timeLeft.seconds < 10
                     ? "0" + timeLeft.seconds
                     : timeLeft.seconds
-                }s`}
+                }`}
               </Text>
             ) : (
               <Text
@@ -207,17 +207,17 @@ export default function ProductTimeClock(props) {
               >
                 {`${
                   timeLeft.days < 10 ? "0" + timeLeft.days : timeLeft.days
-                }d : ${
+                }:${
                   timeLeft.hours < 10 ? "0" + timeLeft.hours : timeLeft.hours
-                }h : ${
+                }:${
                   timeLeft.minutes < 10
                     ? "0" + timeLeft.minutes
                     : timeLeft.minutes
-                }m : ${
+                }:${
                   timeLeft.seconds < 10
                     ? "0" + timeLeft.seconds
                     : timeLeft.seconds
-                }s`}
+                }`}
               </Text>
             )}
           </Flex>

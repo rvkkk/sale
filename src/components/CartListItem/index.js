@@ -22,6 +22,7 @@ import { addToWishList, removeFromWishList } from "../../utils/wishList";
 import { addNewWish, deleteFromWishList } from "../../utils/api/wishLists";
 import { addOffer } from "../../utils/api/offers";
 import { useDisclosure } from "@chakra-ui/react";
+import { Block } from "@mui/icons-material";
 
 export default function CartListItem(props) {
   const [inWishList, setInWishList] = useState(false);
@@ -106,7 +107,7 @@ export default function CartListItem(props) {
   };
 
   return (
-    <Box>
+    <>
       <Card
         p="20px"
         borderRadius="30px"
@@ -121,12 +122,12 @@ export default function CartListItem(props) {
           <Flex gap="4">      
               <Image
               borderRadius="26px"
-              w={{ base: "100px", md: "120px", xl: "180px", "2xl": "220px" }}
+              w={{ base: "100px", md: "120px", lg: "180px", xl: "200px", "2xl": "220px" }}
                 aspectRatio="1/1"
                 objectFit="cover"
                 src={product.images && product.images[0]}
               />
-            <Flex flex="1" flexDir="row" gap="7" justifyContent="space-between">
+            <Flex w="100%" flex="1" flexDir="row" gap="7" justifyContent="space-between">
               <Flex flex="1" flexDir="column" justifyContent="space-between">
                 <Flex justifyContent="space-between" alignItems="center">
                   <Flex flexDir="column" gap="1">
@@ -155,16 +156,16 @@ export default function CartListItem(props) {
                       {product.description}
                     </Text>
                   </Flex>
-                  {product.openingPrice && (
-                    <Box pb="6">
-                      <Box transform="translateX(50px)">
+                  {/*product.openingPrice && (
+                    <Box pt="50px" display="fixed" transform="translateX(80px)">
+                      <Box>
                         <ProductTimeClock
                           date={product.startTime}
                           frame={product.timeFrame}
                         />
                       </Box>
                     </Box>
-                  )}
+                  )*/}
                 </Flex>
               </Flex>
 
@@ -326,6 +327,6 @@ export default function CartListItem(props) {
           </Flex>
         </Box>
       </Card>
-    </Box>
+    </>
   );
 }

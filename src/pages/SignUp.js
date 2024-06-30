@@ -16,6 +16,7 @@ import Container from "../components/Container";
 import { RightIcon2 } from "../components/Icons";
 import axios from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
+import { useCart } from "../components/Contexts/CartContext";
 const googleUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 export default function SignUp() {
@@ -49,6 +50,7 @@ export default function SignUp() {
   const [invalidFloor, setInvalidFloor] = useState("");
   const [invalidApartmentNumber, setInvalidApartmentNumber] = useState("");
   const [invalidPassword, setInvalidPassword] = useState("");
+  const {syncCartOnLogin} = useCart();
 
   const handlePasswordChange = (password) => {
     // בדיקות תקינות על הסיסמה
@@ -138,14 +140,14 @@ export default function SignUp() {
           floor,
           apartmentNumber
         )
-          .then((res) => {
+          .then(async (res) => {
             console.log(res);
            if (res.status === "ok") {
-              window.localStorage.setItem("token", res.token);
               if (getEmail)
                 addToMailingList(email)
                   .then((res) => console.log(res))
                   .catch((err) => console.log(err));
+              await syncCartOnLogin();
               const p = window.localStorage.getItem("new product");
               if (p) window.location.href = routes.CreateProduct.path;
               else window.location.href = routes.HOME.path;
@@ -179,14 +181,14 @@ export default function SignUp() {
             data.name,
             data.sub,
             data.picture
-          ).then((res) => {
+          ).then(async (res) => {
             console.log(res);
             if (res.status === "ok") {
-              window.localStorage.setItem("token", res.token);
               if (getEmail)
                 addToMailingList(email)
                   .then((res) => console.log(res))
                   .catch((err) => console.log(err));
+              await syncCartOnLogin();
               const p = window.localStorage.getItem("new product");
               if (p) window.location.href = routes.CreateProduct.path;
               else window.location.href = routes.HOME.path;

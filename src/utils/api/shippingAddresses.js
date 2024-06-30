@@ -1,78 +1,53 @@
 import axios from "axios";
 
 const baseURL = "https://sale-bid.df.r.appspot.com/";
-const headers = {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-};
+
+const axiosInstance = axios.create({
+  baseURL,
+  withCredentials: true
+});
 
 export const getUserShippingAddresses = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}shipping-addresses`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get('shipping-addresses')
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching user shipping addresses:", err);
+      throw err;
+    });
 };
 
 export const getUserDefaultShippingAddress = () => {
-    return new Promise((resolve, reject) => {
-      axios
-        .get(`${baseURL}shipping-address/default`, headers)
-        .then((res) => {
-          resolve(res.data);
-        })
-        .catch((err) => {
-          //onTokenBroken();
-          reject(err);
-        });
+  return axiosInstance.get('shipping-address/default')
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching user default shipping address:", err);
+      throw err;
     });
-  };
+};
 
 export const addShippingAddress = (payload) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(`${baseURL}shipping-address`, payload, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.post('shipping-address', payload)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error adding shipping address:", err);
+      throw err;
+    });
 };
 
 export const updateShippingAddress = (id, payload) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}shipping-address/${id}`, payload, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.patch(`shipping-address/${id}`, payload)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error updating shipping address:", err);
+      throw err;
+    });
 };
 
 export const deleteShippingAddress = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}shipping-address/${id}`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.delete(`shipping-address/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error deleting shipping address:", err);
+      throw err;
+    });
 };
