@@ -85,11 +85,11 @@ export default function CategorySidebar(props) {
   }, [tags]);
 
   return (
-    <Box w={{base: "360px", sm: "480px", md: "200px", xl: "292px"}} dir="rtl">
+    <Box w={{base: "270px", sm: "270px", md: "200px", xl: "292px"}} dir="rtl">
       <Text fontSize={{md: "26px", lg: "28px", xl: "32px"}} color="primary" display={{base: "none", md: "block"}}>
         {props.categoryName}
       </Text>
-      <Flex
+      {/*<Flex
       display={{base: "flex", md: "none"}}
                     alignItems="center"
                     justifyContent="center"
@@ -115,8 +115,8 @@ export default function CategorySidebar(props) {
                         התחבר
                       </Text>
                     </Flex>
-                  </Flex>
-      <Spacer h={{base: "0", md: "6"}} />
+                  </Flex>*/}
+      <Spacer h={{base: "10", md: "6"}} />
       <Box>
         <Accordion allowMultiple defaultIndex={[0, 1, 2, 5, 6]}>
           <AccordionComponent title="סינון לפי מחיר">
@@ -125,24 +125,26 @@ export default function CategorySidebar(props) {
                 <Flex justifyContent="space-between">
                   <Badge
                     p="2"
-                    px={{base: "6", md: "4", lg:"6"}}
+                    //px={{base: "6", md: "4", lg:"6"}}
                     w={{base: "92px", md: "75px", lg:"92px"}}
                     borderRadius="45px"
                     bg="naturalLightest"
+                      textAlign="center"
                   >
                     {sliderValue[0]} ₪
                   </Badge>
                   <Badge
                     p="2"
-                    px={{base: "6", md: "4", xl:"6"}}
+                    //px={{base: "6", md: "4", xl:"6"}}
                     w={{base: "92px", md: "75px", lg:"92px"}}
                     borderRadius="45px"
                     bg="naturalLightest"
+                    textAlign="center"
                   >
                     {sliderValue[1]} ₪
                   </Badge>
                 </Flex>
-                <Box w={{base: "278px", md: "158px", xl: "250px"}} h="24px" mx="auto">
+                <Box w={{base: "228px", md: "158px", xl: "250px"}} h="24px" mx="auto">
                   <RangeSlider
                     ariaLabel={["min", "max"]}
                     size="lg"

@@ -17,6 +17,8 @@ import { RightIcon2 } from "../components/Icons";
 import axios from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useCart } from "../components/Contexts/CartContext";
+import CountryCodeSelector from "../components/PhoneNumber";
+import { useWishList } from "../components/Contexts/WishListContext";
 const googleUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 export default function SignUp() {
@@ -51,6 +53,8 @@ export default function SignUp() {
   const [invalidApartmentNumber, setInvalidApartmentNumber] = useState("");
   const [invalidPassword, setInvalidPassword] = useState("");
   const {syncCartOnLogin} = useCart();
+  const {syncWishOnLogin} = useWishList();
+
 
   const handlePasswordChange = (password) => {
     // בדיקות תקינות על הסיסמה
@@ -65,11 +69,13 @@ export default function SignUp() {
       );
     else setInvalidPassword("");
   };
+
   const handleEmailChange = (email) => {
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     if (!emailRegex.test(email)) setInvalidEmail('כתובת דוא"ל אינה תקינה');
     else setInvalidEmail("");
   };
+
   const handlePhoneNumberChange = (phoneNumber) => {
     const phoneRegex = /^05\d{1}-?\d{7}$/;
     const phoneHomeRegex = /^0\d{1}-?\d{7}$/;
@@ -77,6 +83,7 @@ export default function SignUp() {
       setInvalidPhoneNumber("מספר שגוי");
     else setInvalidPhoneNumber("");
   };
+
   const handleUserNameChange = (userName) => {
     if (userName.length < 4 || userName.length > 8)
       setInvalidUserName("שם משתמש אינו תקין");
@@ -125,8 +132,7 @@ export default function SignUp() {
         invalidApartmentNumber === ""
       ) {
         setLoading(true);
-        signup(
-          //ID,
+        signup({
           email,
           firstName,
           lastName,
@@ -139,7 +145,7 @@ export default function SignUp() {
           buildingNumber,
           floor,
           apartmentNumber
-        )
+        })
           .then(async (res) => {
             console.log(res);
            if (res.status === "ok") {
@@ -148,7 +154,8 @@ export default function SignUp() {
                   .then((res) => console.log(res))
                   .catch((err) => console.log(err));
               await syncCartOnLogin();
-              const p = window.localStorage.getItem("new product");
+              await syncWishOnLogin();
+              const p = window.localStorage.getItem("new product");//האם להעלות לCOOKIES עם תפוגה של יומיים
               if (p) window.location.href = routes.CreateProduct.path;
               else window.location.href = routes.HOME.path;
             } else {
@@ -174,14 +181,14 @@ export default function SignUp() {
         });
         console.log(data);
         if (data.sub)
-          googleSignin(
-            data.email,
-            data.given_name,
-            data.family_name,
-            data.name,
-            data.sub,
-            data.picture
-          ).then(async (res) => {
+          googleSignin({
+            email: data.email,
+            firstName: data.given_name,
+            lastName: data.family_name,
+            userName: data.name,
+            password: data.sub,
+            profileImage: data.picture
+          }).then(async (res) => {
             console.log(res);
             if (res.status === "ok") {
               if (getEmail)
@@ -189,6 +196,7 @@ export default function SignUp() {
                   .then((res) => console.log(res))
                   .catch((err) => console.log(err));
               await syncCartOnLogin();
+              await syncWishOnLogin();
               const p = window.localStorage.getItem("new product");
               if (p) window.location.href = routes.CreateProduct.path;
               else window.location.href = routes.HOME.path;
@@ -284,7 +292,7 @@ export default function SignUp() {
                         handlePasswordChange(e.target.value);
                       }}
                       value={password}
-                    />
+                    />{/*<CountryCodeSelector/>*/}
                     <Input
                       label="טלפון"
                       isInvalid={invalidPhoneNumber !== ""}

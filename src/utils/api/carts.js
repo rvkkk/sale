@@ -1,106 +1,72 @@
 import axios from "axios";
 
-const baseURL = "https://sale-bid.df.r.appspot.com/";
-const headers = {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-};
+const baseURL = "http://localhost:3001/"//"https://sale-bid.df.r.appspot.com/";
+
+const axiosInstance = axios.create({
+  baseURL,
+  withCredentials: true
+});
 
 export const getCarts = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}carts`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get('carts')
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching carts:", err);
+      throw err;
+    });
 };
 
+
 export const getUserCart = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}carts-user`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        // onTokenBroken();
-        reject(err);
-      });
-  });
+return axiosInstance.get('carts-user')
+.then(res => res.data)
+.catch(err => {
+  console.error("Error fetching user cart:", err);
+  throw err;
+});
 };
 
 export const addCart = (payload) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(`${baseURL}carts`, payload, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+return axiosInstance.post('carts', payload)
+.then(res => res.data)
+.catch(err => {
+  console.error("Error adding cart:", err);
+  throw err;
+});
 };
 
 export const addLocalCart = (payload) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(`${baseURL}carts-add-local`, payload, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+return axiosInstance.post('carts-add-local', payload)
+.then(res => res.data)
+.catch(err => {
+  console.error("Error adding local cart:", err);
+  throw err;
+});
 };
 
 export const updateCart = (payload) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}carts`, payload, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+return axiosInstance.patch('carts', payload)
+.then(res => res.data)
+.catch(err => {
+  console.error("Error updating cart:", err);
+  throw err;
+});
 };
 
 export const deleteCart = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}carts/${id}`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+return axiosInstance.delete(`carts/${id}`)
+.then(res => res.data)
+.catch(err => {
+  console.error("Error deleting cart:", err);
+  throw err;
+});
 };
 
 export const deleteFromCart = (productId) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}carts-remove/${productId}`, headers)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        // onTokenBroken();
-        reject(err);
-      });
-  });
+return axiosInstance.delete(`carts-remove/${productId}`)
+.then(res => res.data)
+.catch(err => {
+  console.error("Error deleting product from cart:", err);
+  throw err;
+});
 };

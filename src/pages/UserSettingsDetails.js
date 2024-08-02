@@ -69,11 +69,13 @@ export default function UserSettingsDetails() {
       return true;
     return false;
   };
+
   const handleEmailChange = (email) => {
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     if (!emailRegex.test(email)) setInvalidEmail('כתובת דוא"ל אינה תקינה');
     else setInvalidEmail("");
   };
+
   const handlePhoneNumberChange = (phoneNumber) => {
     const phoneRegex = /^05\d{1}-?\d{7}$/;
     const phoneHomeRegex = /^0\d{1}-?\d{7}$/;
@@ -81,23 +83,21 @@ export default function UserSettingsDetails() {
     setInvalidPhoneNumber("מספר שגוי");
     else setInvalidPhoneNumber("");
   };
+
   const handleUserNameChange = (userName) => {
     if (userName.length <= 4 || userName.length >= 8) setInvalidUserName("שם משתמש אינו תקין");
     else setInvalidUserName("");
   };
 
   const handlePicture = (picture) => {
-    //setLoading(true);
     console.log(picture);
     updateProfileImage(picture)
       .then((res) => {
-        // setLoading(false);
         alert("התמונה נשמרה בהצלחה!");
       })
       .catch((err) => {
         alert("אנא נסה שנית");
         setPicture("");
-        //setLoading(false);
       });
   };
 
@@ -168,8 +168,7 @@ export default function UserSettingsDetails() {
       invalidBuildingNumber === ""
     ) {
       setLoading(true);
-      updateUser(
-        //ID,
+      updateUser({
         email,
         firstName,
         lastName,
@@ -182,7 +181,7 @@ export default function UserSettingsDetails() {
         buildingNumber,
         floor,
         apartmentNumber
-      )
+    })
         .then((res) => {
           alert("הנתונים נשמרו בהצלחה!");
           setLoading(false);
@@ -197,12 +196,6 @@ export default function UserSettingsDetails() {
   const handleButtonClick = () => {
     const fileInput = document.getElementById("fileInput");
     fileInput.click();
-  };
-  const putPicture = (image) => {
-    const imageBlob = new Blob([image], { type: "image/jpeg" });
-    const imageUrl = URL.createObjectURL(imageBlob);
-    console.log(imageUrl);
-    setPicture(imageUrl);
   };
 
   useEffect(() => {
@@ -223,7 +216,7 @@ export default function UserSettingsDetails() {
         setBuildingNumber(user.buildingNumber);
         setFloor(user.floor);
         setApartmentNumber(user.apartmentNumber);
-        putPicture(user.profileImage);
+        setPicture(user.profileImage);
       })
       .catch((err) => {
         setLoading(false);

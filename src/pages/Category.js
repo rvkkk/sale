@@ -16,6 +16,12 @@ import {
   PopoverArrow,
   Spacer,
   Grid,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  useDisclosure,
+  ModalCloseButton,
+  ModalBody,
 } from "@chakra-ui/react";
 import { FaListUl } from "react-icons/fa";
 import { RxDashboard } from "react-icons/rx";
@@ -42,6 +48,9 @@ import { routes } from "../routes";
 import { CategoryIcon, Filter2Icon, SortIcon } from "../components/Icons";
 import { getSubcategory } from "../utils/api/subcategories";
 import { extendTheme, createBreakpoints } from "@chakra-ui/react";
+import CountryCodeSelector from "../components/PhoneNumber";
+import { getAProductsByCategory } from "../utils/api/auctionProducts";
+import { getAllProductsByCategory } from "../utils/api/allProducts";
 
 export default function Category() {
   const [loading, setLoading] = useState(true);
@@ -95,6 +104,17 @@ export default function Category() {
     setCurrentPage(page);
   };
 
+  const {
+    isOpen: isSortOpen,
+    onOpen: onSortOpen,
+    onClose: onSortClose,
+  } = useDisclosure();
+  const {
+    isOpen: isListOpen,
+    onOpen: onListOpen,
+    onClose: onListClose,
+  } = useDisclosure();
+
   const setQueryParametersToState = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const query = urlParams.get("query");
@@ -112,17 +132,35 @@ export default function Category() {
   };
 
   useEffect(() => {
+    getProducts();
     let category = window.location.href.split("/").pop().split("/")[0];
     getSubcategory(category).then((res) => {
       console.log(res);
       setCategory(res.subcategory);
       setLoading(false);
-      getProducts(res.subcategory.name);
+      //getProducts(res.subcategory.name);
     });
   }, []);
 
-  const getProducts = (categoryName) => {
+  const getProducts = () => {
+    getAllProductsByCategory(window.location.href.split("/").pop().split("/")[0], 1, 100).then((res) => {
+      console.log(res);
+      const products = res.products.products;
+  setProducts(products);
+  /*const sortedProducts = sortPriceUp(products);
+        console.log(sortedProducts)
+  setMinPrice(sortedProducts[0]?.price || 0);
+  setMaxPrice(sortedProducts[sortedProducts.length - 1]?.price || 0);*/
+  setMinPrice(products[0]?.price || 0);
+  setMaxPrice(products[products.length - 1]?.price || 0);
+      setPages(res.products.amount);
+    })
+      //setLoading(false);
     // setLoading(true);
+   /* getAProductsByCategory(window.location.href.split("/").pop().split("/")[0], 1, 50).then((res) => {
+      console.log(res);
+      const products = res.products.products;
+  setProducts(products);})
     searchProducts(categoryName, tags, 1, 21, minPrice, maxPrice, sortBy)
       .then((res) => {
         console.log(res);
@@ -132,9 +170,9 @@ export default function Category() {
         console.log(sortedProducts)
         setMinPrice(sortedProducts[0]?.price || 0);
     setMaxPrice(sortedProducts[sortedProducts.length - 1]?.price || 0);
-        setPages(res.products.pages);
+        setPages(Math.ceil(res.products.amount)/21);
         //setLoading(false);
-      })
+      })*/
       .catch((err) => console.log(err));
   };
 
@@ -366,7 +404,6 @@ export default function Category() {
                   </Popover>
                 </Flex>
               </Flex>
-
               {products.length === 0 && (
                 <Flex justifyContent="center" alignItems="center" h="300px">
                   <Text fontSize="20px" color="naturalDark">
@@ -429,108 +466,55 @@ export default function Category() {
               mx="auto"
               justifyContent="space-between"
             >
-              <Menu>
-                <MenuButton
-                  as={Button}
+                  <Flex
                   bg="white"
-                  _active={{ bg: "white" }}
-                  _focus={{ bg: "white" }}
-                  _hover={{ bg: "white" }}
                   border="1px solid transparent"
                   borderRadius="10px"
                   px="15px"
                   borderColor="naturalDarkest"
-                >
-                  <Flex
                     gap="10px"
                     py="2"
                     fontSize="16px"
                     color="naturalDarkest"
                     fontWeight="normal"
+                    onClick={onListOpen}
                   >
                     <CategoryIcon />
                     <Text pt="2px">קטגוריות</Text>
                   </Flex>
-                </MenuButton>
-                <MenuList
-                  dir="rtl"
-                  fontSize="16px"
-                  color="naturalDarkest"
-                  border="none"
-                  shadow="lg"
-                  p="2"
-                  py="4"
-                  postion="relative"
-                  zIndex={4}
-                  w="360px"
-                >
-                  <MenuItem
-                    onClick={() => {
-                      setProducts(sortPriceUp(products));
-                      setSortBy("priceUp");
-                    }}
-                    borderRadius="8px"
-                    bg={sortBy === "priceUp" && "othersLight"}
-                    color={sortBy === "priceUp" && "primary"}
-                    _hover={{ bg: "othersLight", color: "primary" }}
-                    p="4"
-                  >
-                    מחיר: מהנמוך לגבוה
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      setProducts(sortPriceDown(products));
-                      setSortBy("priceDown");
-                    }}
-                    borderRadius="8px"
-                    bg={sortBy === "priceDown" && "othersLight"}
-                    color={sortBy === "priceDown" && "primary"}
-                    _hover={{ bg: "othersLight", color: "primary" }}
-                    p="4"
-                  >
-                    מחיר: מהגבוה לנמוך
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      setProducts(sortMostBuyProducts(products));
-                      setSortBy("mostBuy");
-                    }}
-                    borderRadius="8px"
-                    bg={sortBy === "mostBuy" && "othersLight"}
-                    color={sortBy === "mostBuy" && "primary"}
-                    _hover={{ bg: "othersLight", color: "primary" }}
-                    p="4"
-                  >
-                    הנמכרים ביותר
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      setProducts(sortPopularAuction(products));
-                      setSortBy("popular");
-                    }}
-                    borderRadius="8px"
-                    bg={sortBy === "popular" && "othersLight"}
-                    color={sortBy === "popular" && "primary"}
-                    _hover={{ bg: "othersLight", color: "primary" }}
-                    p="4"
-                  >
-                    פופולריות
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      setProducts(sortNewest(products));
-                      setSortBy("newest");
-                    }}
-                    borderRadius="8px"
-                    bg={sortBy === "newest" && "othersLight"}
-                    color={sortBy === "newest" && "primary"}
-                    _hover={{ bg: "othersLight", color: "primary" }}
-                    p="4"
-                  >
-                    מחדש לישן
-                  </MenuItem>
-                </MenuList>
-              </Menu>
+              <Modal isOpen={isListOpen} onClose={onListClose} motionPreset="slideInRight"
+              blockScrollOnMount={false}
+              >
+              <ModalOverlay/>
+              <ModalContent
+                h="100%"
+  maxH="100vh"
+                margin="0"
+                minW="270px"
+                w={{ base: "270px", sm: "33%" }}
+                border="none"
+                bg="white"
+                dir="rtl"
+                shadow="0px 5px 40px rgba(0, 0, 0, 0.1)"
+                position="fixed"
+                top="0"
+                right="0"
+                bottom="0"
+                borderRadius="0"
+>
+                <ModalCloseButton
+                size="md"
+                color="primary"
+                right="2"
+                //left="100"
+                top="2"
+                //position="absolute"
+                //top="68.7px"
+                //transform="translateX(-50%)"
+                bg="white"
+              />
+                </ModalContent>
+              </Modal>
               <Menu>
                 <MenuButton
                   as={Button}
@@ -632,42 +616,58 @@ export default function Category() {
                   </MenuItem>
                 </MenuList>
               </Menu>
-              <Menu>
-                <MenuButton
-                  as={Button}
+              <Flex
                   bg="white"
-                  _active={{ bg: "white" }}
-                  _focus={{ bg: "white" }}
-                  _hover={{ bg: "white" }}
                   border="1px solid transparent"
                   borderRadius="10px"
-                  borderColor="naturalDarkest"
                   px="15px"
-                >
-                  <Flex
+                  borderColor="naturalDarkest"
                     gap="10px"
                     py="2"
                     fontSize="16px"
-                    color="naturalDarkest"
+                    color="naturalDarkest"  
                     fontWeight="normal"
+                    onClick={onSortOpen}
                   >
                     <Filter2Icon />
                     <Text pt="2px">סינון</Text>
                   </Flex>
-                </MenuButton>
-                <MenuList
-                  dir="rtl"
-                  fontSize="16px"
-                  color="naturalDarkest"
-                  border="none"
-                  shadow="lg"
-                  postion="relative"
-                  zIndex={4}
-                  w="360px"
-                  p="0"
-                >
-                  <MenuItem>
-                    <CategorySidebar
+                  <Modal isOpen={isSortOpen} onClose={onSortClose}
+            motionPreset="slideInRight"
+              blockScrollOnMount={false}
+              scrollBehavior="inside"
+            >
+              <ModalOverlay />
+              <ModalContent
+                h="100%"
+  maxH="100vh"
+                margin="0"
+                minW="270px"
+                w={{ base: "270px", sm: "33%" }}
+                border="none"
+                bg="white"
+                dir="rtl"
+                shadow="0px 5px 40px rgba(0, 0, 0, 0.1)"
+                position="fixed"
+                top="0"
+                right="0"
+                bottom="0"
+                borderRadius="0"
+>
+                <ModalCloseButton
+                size="md"
+                color="primary"
+                right="2"
+                //left="100"
+                top="2"
+                //position="absolute"
+                //top="68.7px"
+                //transform="translateX(-50%)"
+                bg="white"
+              />
+                <ModalBody p="0"  dir="rtl">
+                <Box justifyContent="center" h="100%">
+<CategorySidebar
                       onChangePriceSlider={(val) => {
                         const min = val[0];
                         const max = val[1];
@@ -679,9 +679,11 @@ export default function Category() {
                       maxPrice={maxPrice}
                       onChangeTags={(tags) => setTags(tags)}
                     />
-                  </MenuItem>
-                </MenuList>
-              </Menu>
+  </Box>
+                   
+                  </ModalBody>
+                </ModalContent>
+              </Modal>
             </Flex>
 
             {products.length === 0 && (

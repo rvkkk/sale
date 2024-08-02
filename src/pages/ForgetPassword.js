@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import Input from "../components/Input";
 import Button from "../components/Button";
-import { checkIfUserExists } from "../utils/api/users";
+import { sendEmailAuth } from "../utils/api/users";
 import { routes } from "../routes";
 import { useNavigate } from "react-router-dom";
 import { RightIcon2 } from "../components/Icons";
@@ -27,13 +27,14 @@ export default function ForgetPassword() {
       setInvalidInput('כתובת דוא"ל או שם משתמש אינו תקין');
     else setInvalidInput("");
   };
-  const checkIfAccountExists = () => {
+  const sendEmail = () => {
     if (input === "") setInvalidInput("שדה חובה");
     if (input !== "" && invalidInput === "")
-      return checkIfUserExists(input).then((res) => {
-        console.log(res);
-        if (res.status === "error") setInvalidInput("משתמש לא קיים במערכת");
-        else navigate(routes.EmailAuth.path, { state: res.email });
+      return sendEmailAuth(input).then((res) => {
+        console.log(res.status);
+        if (res.status === 404) setInvalidInput("משתמש לא קיים במערכת");
+        else if (res.status === 201) navigate(routes.EmailAuth.path, { state: input });
+        else setInvalidInput("קרתה תקלה, נסה שוב במועד מאוחר יותר");
       });
   };
 
@@ -73,7 +74,7 @@ export default function ForgetPassword() {
               <Spacer h="5"></Spacer>
               <Button
                 isDisabled={input === "" || invalidInput !== ""}
-                onClick={checkIfAccountExists}
+                onClick={sendEmail}
               >
                 המשך
               </Button>
@@ -135,7 +136,7 @@ export default function ForgetPassword() {
                 h="60px"
                 bg="primaryLight"
                 isDisabled={input === "" || invalidInput !== ""}
-                onClick={checkIfAccountExists}
+                onClick={sendEmail}
               >
                 המשך
               </Button>

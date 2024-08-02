@@ -114,9 +114,7 @@ export default function About() {
                         variant="outline"
                         bg="white"
                         textColor="primary"
-                        onClick={() =>
-                          (window.location.href = "/article/howToStartASale")
-                        }
+                        onClick={() => (window.location.href = routes.CreatePArticle.path.replace(":id", 1))}
                       >
                         <PlayIcon /> איך לפתוח מכירה
                       </Button>

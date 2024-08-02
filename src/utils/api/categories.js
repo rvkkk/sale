@@ -1,114 +1,78 @@
 import axios from "axios";
 
-const baseURL = "https://sale-bid.df.r.appspot.com/"
+const baseURL = "http://localhost:3001/"//"https://sale-bid.df.r.appspot.com/"
+
+const axiosInstance = axios.create({
+  baseURL,
+  withCredentials: true,
+});
 
 export const getCategories = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}categories`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  return axios.get(`${baseURL}categories`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching categories:", err);
+      throw err;
+    });
 };
 
 export const getMainCategories = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}categories-main`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  return axios.get(`${baseURL}categories-main`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching main categories:", err);
+      throw err;
+    });
 };
 
 export const getTopCategories = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}categories-top`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  return axios.get(`${baseURL}categories-top`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching top categories:", err);
+      throw err;
+    });
 };
 
 export const getCategory = (title) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}category/${title}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  return axios.get(`${baseURL}category/${title}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching category:", err);
+      throw err;
+    });
 };
 
-/*const fileReader = new FileReader();
-    fileReader.onload = function(event) {
-      const imageData = event.target.result;
-    axios
-      .post(`${baseURL}category`, {title, name,  image: imageData, number}, {
-        headers: {
-          'Content-Type': image.type,
-           "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        },
-      })*/
-
 export const addCategory = (title, name, image) => {
-  return new Promise((resolve, reject) => {
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("name", name);
-    formData.append("image", image)
-    axios
-      .post(`${baseURL}category`, formData, {
-        headers: {
-           "Content-Type": 'multipart/form-data',
-           "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("name", name);
+  formData.append("image", image);
+  
+  return axiosInstance.post('category', formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  })
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error adding category:", err);
+      throw err;
+    });
 };
 
 export const updateCategory = ({ title, name }) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}category/${title}`, { name })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  return axiosInstance.patch(`category/${title}`, { name })
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error updating category:", err);
+      throw err;
+    });
 };
 
 export const deleteCategory = (title) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}category/${title}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  return axiosInstance.delete(`category/${title}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error deleting category:", err);
+      throw err;
+    });
 };

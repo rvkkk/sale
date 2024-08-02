@@ -16,6 +16,7 @@ import { LoginFromGoogle } from "../utils/api/users";
 import axios from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useCart } from "../components/Contexts/CartContext";
+import { useWishList } from "../components/Contexts/WishListContext";
 const googleUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
 
 export default function Login() {
@@ -29,6 +30,7 @@ export default function Login() {
   const [invalidInput, setInvalidInput] = useState("");
   const [invalidPassword, setInvalidPassword] = useState("");
   const { syncCartOnLogin } = useCart();
+  const {syncWishOnLogin} = useWishList();
 
   const handlePasswordChange = (password) => {
     setError("");
@@ -78,6 +80,7 @@ export default function Login() {
                 window.localStorage.setItem("password", password);
               }
               await syncCartOnLogin();
+              await syncWishOnLogin();
               const p = window.localStorage.getItem("new product");
               if (p) window.location.href = routes.CreateProduct.path;
               else window.location.href = routes.HOME.path;
@@ -100,6 +103,7 @@ export default function Login() {
                 window.localStorage.setItem("password", password);
               }
               await syncCartOnLogin();
+              await syncWishOnLogin();
               const p = window.localStorage.getItem("new product");
               if (p) {
                 if (!p.auction) {//צריך לבדוק את זה מה עדיף
@@ -162,7 +166,8 @@ export default function Login() {
         if (data.email_verified) 
           googleLogin(data.email).then(async (res) => {
           if (res.status === "ok") {   
-            await syncCartOnLogin();       
+            await syncCartOnLogin();     
+            await syncWishOnLogin();
             const p = window.localStorage.getItem("new product");
             if (p) window.location.href = routes.CreateProduct.path;
             else window.location.href = routes.HOME.path;

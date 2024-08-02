@@ -26,7 +26,7 @@ export const getUserReviews = () => {
 };
 
 export const getProductReviews = (productId) => {
-  return axiosInstance.get(`reviews-product/${productId}`)
+  return axios.get(`${baseURL}reviews-product/${productId}`)
     .then(res => res.data)
     .catch(err => {
       console.error("Error fetching product reviews:", err);

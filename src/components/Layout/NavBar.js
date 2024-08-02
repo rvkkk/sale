@@ -28,19 +28,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
-import {
-  addToCart,
-  clearCart,
-  getCart,
-  removeFromCart,
-} from "../../utils/cart";
 import { getUserProfile } from "../../utils/api/users";
-import {
-  getUserCart,
-  deleteFromCart,
-  updateCart,
-  deleteCart,
-} from "../../utils/api/carts";
 import React from "react";
 //import { useWebSocket } from "../WebSocketProvider";
 import SaleBID, { SmallLOGOIcon } from "../SaleBID";
@@ -49,7 +37,6 @@ import SearchComponent from "../SearchComponent";
 import { Link, useLocation } from "react-router-dom";
 import { routes } from "../../routes";
 import {
-  Icon5,
   ArrowBackIcon,
   ArrowIcon,
   BillingIcon,
@@ -66,6 +53,8 @@ import {
   UserIcon,
   UserMobileIcon,
   TrashIcon,
+  WalletIcon,
+  FaveIcon,
 } from "../Icons";
 import NavCartListItem from "../NavCartListItem";
 import Button from "../Button";
@@ -77,17 +66,12 @@ import { useCart } from "../Contexts/CartContext";
 
 export default function NavBar({ withSidebar, logo, change }) {
   const [query, setQuery] = useState("");
- // const [products, setProducts] = useState([]);
-  const [fetchedUser, setFetchedUser] = useState(false);
-  const [userLogged, setUserLogged] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [hideOnScroll, setHideOnScroll] = useState(false);
   const [fixedLinks, setFixedLinks] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const { cart,
-    updateProductInCart,
-    removeProductFromCart,
-    deleteMyCart } = useCart();
+  const { isAuthenticated, logout } = useAuth();
+  const { cart, updateProductInCart, removeProductFromCart, deleteMyCart } =
+    useCart();
   const [user, setUser] = useState({
     userName: "Sale Bid",
     profileImage: "",
@@ -103,25 +87,22 @@ export default function NavBar({ withSidebar, logo, change }) {
     slidesToScroll: 1,
   };
 
-  const getUser = () => {
-    if (!fetchedUser) {
-      return getUserProfile()
-        .then((res) => {
-          //setUser(res.user);
-          setFetchedUser(true);
-          setUserLogged(true);
-        })
-        .catch((err) => {
-          setUserLogged(false);
-          setFetchedUser(true);
-        });
-    }
-  };
+  const {
+    isOpen: isCartOpen,
+    onOpen: onCartOpen,
+    onClose: onCartClose,
+  } = useDisclosure();
+  const {
+    isOpen: isListOpen,
+    onOpen: onListOpen,
+    onClose: onListClose,
+  } = useDisclosure();
+  const {
+    isOpen: isUserOpen,
+    onOpen: onUserOpen,
+    onClose: onUserClose,
+  } = useDisclosure();
 
-  const logout = () => {
-    setUserLogged(false);
-    window.location.href = "/";
-  };
   /*  useEffect(() => {
 
     getMyCart();
@@ -240,7 +221,13 @@ export default function NavBar({ withSidebar, logo, change }) {
 
   useEffect(() => {
     setQuery(query);
-    if (isAuthenticated) getUser();
+    if (isAuthenticated) {
+      getUserProfile()
+        .then((res) => {
+          setUser(res.user);
+        })
+        .catch((err) => {});
+    }
   }, [query, isAuthenticated]);
 
   useEffect(() => {
@@ -323,7 +310,7 @@ export default function NavBar({ withSidebar, logo, change }) {
               w="20%"
               justifyContent="flex-end"
             >
-              <Link aria-label="link to website" role="link" to="/">
+              <Link aria-label="link to home page" role="link" to="/">
                 <SaleBID />
               </Link>
             </Flex>
@@ -348,7 +335,8 @@ export default function NavBar({ withSidebar, logo, change }) {
                   />
                 </Link>
 
-                <Popover closeOnBlur={false}>
+                <Popover>
+                  {/*closeOnBlur={false}*/}
                   {({ onClose }) => (
                     <>
                       <PopoverTrigger>
@@ -575,7 +563,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                       />
                       <MenuItemComponent
                         path={
-                          userLogged
+                          isAuthenticated
                             ? routes.UserSettingsMySales.path
                             : routes.LOGIN.path
                         }
@@ -584,7 +572,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                       />
                       <MenuItemComponent
                         path={
-                          userLogged
+                          isAuthenticated
                             ? routes.UserSettingsMyOrders.path
                             : routes.LOGIN.path
                         }
@@ -593,7 +581,7 @@ export default function NavBar({ withSidebar, logo, change }) {
                       />
                       <MenuItemComponent
                         path={
-                          userLogged
+                          isAuthenticated
                             ? routes.UserSettingsShippingAddress.path
                             : routes.LOGIN.path
                         }
@@ -613,18 +601,17 @@ export default function NavBar({ withSidebar, logo, change }) {
 
                       <MenuItemComponent
                         path={
-                          userLogged
+                          isAuthenticated
                             ? routes.UserSettingsDetails.path
                             : routes.LOGIN.path
                         }
                         icon={SettingIcon}
                         name="עדכון פרטים"
                       />
-                      {userLogged ? (
+                      {isAuthenticated ? (
                         <MenuItemComponent
                           onClick={() => {
                             logout();
-                            window.location.href = routes.HOME.path;
                           }}
                           icon={LogoutIcon}
                           name="התנתק"
@@ -954,99 +941,133 @@ export default function NavBar({ withSidebar, logo, change }) {
             <SmallLOGOIcon />
           </Link>
           <Flex gap="15px">
-            <Menu placement="bottom" role="menu">
-              <MenuButton aria-label="open user links">
-                {user.profileImage !== "" ? (
+            {isAuthenticated ? <><Flex alignItems="center" cursor="pointer" onClick={onUserOpen}> {user.profileImage !== "" ? (
                   <Avatar
                     w="22px"
                     h="22px"
-                    //name={user.userName}
                     src={user.profileImage}
                     borderRadius="8px"
                   />
                 ) : (
                   <UserMobileIcon />
-                )}
-              </MenuButton>
-              {isAuthenticated ? (
-                <MenuList
-                  dir="rtl"
-                  w="223px"
-                  p="20px 10px"
-                  bg="white"
-                  borderRadius="12px"
-                  shadow="0px 1px 54px rgba(35, 38, 59, 0.2)"
-                >
-                  <MenuItemComponent
+                )}</Flex>
+               <Modal isOpen={isUserOpen} onClose={onUserClose}
+            motionPreset="slideInRight"
+              blockScrollOnMount={false}
+            >
+              <ModalOverlay />
+              <ModalContent
+                h="100%"
+                margin="0"
+                minW="300px"
+                w={{ base: "270px", sm: "33%" }}
+                border="none"
+                bg="white"
+                dir="rtl"
+                shadow="-10px 0px 50px rgba(24, 44, 105, 0.3)"
+                position="fixed"
+                top="0"
+                right="0"
+                bottom="0"
+                borderRadius="0"
+>
+                <ModalCloseButton
+                size="md"
+                color="primary"
+                right="2"
+                top="2"
+                bg="white"
+              />
+                <ModalBody pt="10" pb="20px" px="6" pr="4" dir="rtl">
+                <Flex
+            justifyContent="space-between"
+            flexDir="column"
+            h="100%"
+          >
+            <Flex flexDir="column" gap="2" alignItems="center">
+                <Avatar
+                  w="60px"
+                  h="60px"
+                  objectFit="cover"
+                  borderRadius="14px"
+                  src={user && user.profileImage}
+                />
+              <Text fontSize="14px" fontWeight="medium" color="naturalBlack">
+                {user ? user.userName : "טוען.."}
+              </Text>
+            </Flex>
+            <Box>
+                  <UserItemComponent
                     path={routes.HOME.path}
                     icon={HomeIcon}
                     name="ראשי"
                   />
-                  <MenuItemComponent
+                  <UserItemComponent
                     path={
-                      userLogged
+                      isAuthenticated
                         ? routes.UserSettingsMySales.path
                         : routes.LOGIN.path
                     }
                     icon={MessengerIcon}
                     name="מכירות"
                   />
-                  <MenuItemComponent
+                  <UserItemComponent
                     path={
-                      userLogged
+                      isAuthenticated
                         ? routes.UserSettingsMyOrders.path
                         : routes.LOGIN.path
                     }
                     icon={OrderIcon}
                     name="הזמנות"
                   />
-                  <MenuItemComponent
+                  <UserItemComponent
                     path={
-                      userLogged
+                      isAuthenticated
+                        ? routes.UserSettingsWallet.path
+                        : routes.LOGIN.path
+                    }
+                    icon={WalletIcon}
+                    name="ארנק"
+                  />
+                  <UserItemComponent
+                    path={
+                      isAuthenticated
                         ? routes.UserSettingsShippingAddress.path
                         : routes.LOGIN.path
                     }
                     icon={BillingIcon}
                     name="כתובת למשלוח"
                   />
-                  {/*} <MenuItemComponent
+                  <UserItemComponent
                     path={
-                      userLogged
-                        ? routes.UserSettingsDeliveryTraker.path
+                      isAuthenticated
+                        ? routes.UserSettingsWhiteList.path
                         : routes.LOGIN.path
                     }
-                    icon={SettingsIcon}
-                    name="מעקב משלוחים"
-                  />*/}
-                  <Divider h="1px" bg="#D9D9D9" my="19px" />
-
-                  <MenuItemComponent
+                    icon={FaveIcon}
+                    name="רשימת משאלות"
+                  />                 
+                  <UserItemComponent
                     path={
-                      userLogged
+                      isAuthenticated
                         ? routes.UserSettingsDetails.path
                         : routes.LOGIN.path
                     }
                     icon={SettingIcon}
                     name="עדכון פרטים"
                   />
-                  {userLogged ? (
-                    <MenuItemComponent
+                  </Box><UserItemComponent
                       onClick={() => {
                         logout();
-                        window.location.href = routes.HOME.path;
                       }}
                       icon={LogoutIcon}
                       name="התנתק"
-                    />
-                  ) : (
-                    <MenuItemComponent
-                      path={routes.LOGIN.path}
-                      icon={LogoutIcon}
-                      name="התחבר"
-                    />
-                  )}
-                </MenuList>
-              ) : (
+                    /></Flex>
+                </ModalBody></ModalContent></Modal></> :
+            <Menu placement="bottom" role="menu">
+              <MenuButton aria-label="open user login">
+                  <UserMobileIcon />
+              </MenuButton>
                 <MenuList
                   dir="rtl"
                   border="none"
@@ -1080,211 +1101,238 @@ export default function NavBar({ withSidebar, logo, change }) {
                     </Flex>
                   </MenuItem>
                 </MenuList>
-              )}
             </Menu>
-            <Popover closeOnBlur={false}>
-              {({ onClose }) => (
-                <>
-                  <PopoverTrigger>
-                    <Flex
-                      justifyContent="center"
-                      alignItems="center"
-                      role="list"
-                    >
-                      <CartIcon2 />
-                      {cart.products && cart.products.length > 0 && (
-                        <Flex
-                          position="absolute"
-                          //top="1"
-                          //right="1"
-                          mb="10px"
-                          ml="15px"
-                          alignItems="center"
-                          justifyContent="center"
-                          w="14px"
-                          h="14px"
-                          //pt="1px"
-                          borderRadius="full"
-                          bg="otherError"
-                          border="2px solid transparent"
-                          borderColor="primary"
-                        >
-                          <Text
-                            fontSize="8px"
-                            mt="1px"
-                            lineHeight="8px"
-                            textColor="white"
-                          >
-                            {cart.products.length}
-                          </Text>
-                        </Flex>
-                      )}
-                    </Flex>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    // h="637px"
-                    w="357px"
-                    borderRadius="16px"
-                    border="none"
-                    bg="white"
-                    shadow="0px 5px 40px rgba(0, 0, 0, 0.1)"
+}
+            <Flex
+              justifyContent="center"
+              alignItems="center"
+              role="openCart"
+              onClick={onCartOpen}
+            >
+              <CartIcon2 />
+              {cart.products && cart.products.length > 0 && (
+                <Flex
+                  position="absolute"
+                  //top="1"
+                  //right="1"
+                  mb="10px"
+                  ml="15px"
+                  alignItems="center"
+                  justifyContent="center"
+                  w="14px"
+                  h="14px"
+                  //pt="1px"
+                  borderRadius="full"
+                  bg="otherError"
+                  border="2px solid transparent"
+                  borderColor="primary"
+                >
+                  <Text
+                    fontSize="8px"
+                    mt="1px"
+                    lineHeight="8px"
+                    textColor="white"
                   >
-                    <PopoverArrow />
-                    <PopoverCloseButton
-                      size="sm"
-                      position="absolute"
-                      left="0"
-                      top="68.7px"
-                      transform="translateX(-50%)"
-                      bg="white"
-                      border="1.24779px solid"
-                      borderColor="naturalDark"
-                      borderRadius="full"
-                    />
-                    <PopoverBody py="6" px="6" dir="rtl">
-                      <Flex alignItems="center" justifyContent="space-between">
-                        <Flex gap="2" fontSize="16px" lineHeight="16.5px">
-                          <Text color="naturalDarkest" fontWeight="semibold">
-                            העגלה שלי
-                          </Text>
-                          <Text color="naturalDarkest">
-                            ({cart.products && cart.products.length})
-                          </Text>
-                        </Flex>
-
-                        <ChakraButton
-                          variant="link"
-                          onClick={() => deleteMyCart()}
-                          style={{ textDecoration: "none" }}
-                          color="primaryLight"
-                          fontSize="13px"
-                          aria-label="clear your cart"
-                          role="button"
-                        >
-                          רוקן עגלה
-                          <TrashIcon fill="#003DFF" />
-                        </ChakraButton>
-                      </Flex>
-                      <Spacer h="10px" />
-                      <Box overflow="auto" className="slider-container">
-                        <Slider {...settings}>
-                          {cart.products && (
-                            <>
-                              {cart.products.map((p, key) => (
-                                <React.Fragment key={key}>
-                                  <NavCartListItem
-                                    title={p.product.title}
-                                    price={p.product.price}
-                                    images={p.product.images}
-                                    amount={p.amount}
-                                    quantity={p.product.quantity}
-                                    onChangeAmount={(amount) =>
-                                      updateProductInCart(p.product, amount, p.amount)
-                                    }
-                                    onDelete={() => {
-                                      const a = window.confirm(
-                                        "האם אתה בטוח שברצונך למחוק את המוצר מהעגלה?"
-                                      );
-                                      if (a) {
-                                        removeProductFromCart(p.product.id);
-                                      }
-                                    }}
-                                  />
-                                </React.Fragment>
-                              ))}
-                            </>
-                          )}
-                        </Slider>
-                      </Box>
-
-                      <Spacer h="38px" />
-                      <Flex justifyContent="space-between">
-                        <Box>
-                          <Text
-                            fontWeight="500"
-                            fontSize="22px"
-                            color="naturalBlack"
-                            lineHeight="30px"
-                          >
-                            סך הכל
-                          </Text>
-                          <Text
-                            color="naturalDark"
-                            fontSize="14px"
-                            lineHeight="22px"
-                          >
-                            משלוח, עמלות ומיסים יחושבו בשעת ההזמנה
-                          </Text>
-                        </Box>
-
-                        <Text
-                          fontWeight="500"
-                          fontSize="22px"
-                          lineHeight="30px"
-                          color="naturalBlack"
-                        >
-                          ₪
-                          {(cart.products &&
-                            cart.products.length >= 1 &&
-                            Math.round(
-                              cart.products.reduce(
-                                (a, b) =>
-                                  parseFloat(a) +
-                                  parseFloat(b.product.price * b.amount),
-                                0
-                              ) * 100
-                            ) / 100) ||
-                            "0"}
-                        </Text>
-                      </Flex>
-                      <Box mt="38px">
-                        <Button.Secondary
-                          aria-label="link to keep shoping"
-                          borderColor="primary"
-                          color="primary"
-                          fontSize="20px"
-                          role="button"
-                          onClick={onClose}
-                        >
-                          להמשיך בקניות
-                        </Button.Secondary>
-                        <Spacer h="4" />
-                        <Button>
-                          <Flex
-                            alignItems="center"
-                            gap="4"
-                            aria-label="link to pay my cart"
-                            role="button"
-                            onClick={() =>
-                              (window.location.href = routes.ShoppingCart.path)
-                            }
-                          >
-                            לתשלום <ArrowBackIcon />
-                          </Flex>
-                        </Button>
-                      </Box>
-                    </PopoverBody>
-                  </PopoverContent>
-                </>
-              )}
-            </Popover>
-
-            <Popover>
-              <PopoverTrigger>
-                <Flex justifyContent="center" alignItems="center" role="list">
-                  <MobileList />
+                    {cart.products.length}
+                  </Text>
                 </Flex>
-              </PopoverTrigger>
-              <PopoverContent
-                w="270px"
+              )}
+            </Flex>
+            <Modal isOpen={isCartOpen} onClose={onCartClose}
+            motionPreset="slideInRight"
+              blockScrollOnMount={false}
+            >
+              <ModalOverlay />
+              <ModalContent
+                //h="100%"
+                margin="0"
+                minW="300px"
+                w={{ base: "270px", sm: "33%" }}
                 border="none"
                 bg="white"
                 dir="rtl"
                 shadow="0px 5px 40px rgba(0, 0, 0, 0.1)"
+                position="fixed"
+                top="0"
+                right="0"
+                bottom="0"
+                borderRadius="0"
+>
+                <ModalCloseButton
+                size="md"
+                color="primary"
+                right="2"
+                //left="100"
+                top="2"
+                //position="absolute"
+                //top="68.7px"
+                //transform="translateX(-50%)"
+                bg="white"
+                _focus={{ boxShadow: 'none' }}
+              />
+                <ModalBody py="10" px="6" dir="rtl">
+                  <Flex alignItems="center" justifyContent="space-between">
+                    <Flex gap="2" fontSize="16px" lineHeight="16.5px">
+                      <Text color="naturalDarkest" fontWeight="semibold">
+                        העגלה שלי
+                      </Text>
+                      <Text color="naturalDarkest">
+                        ({cart.products && cart.products.length})
+                      </Text>
+                    </Flex>
+
+                    <ChakraButton
+                      variant="link"
+                      onClick={() => deleteMyCart()}
+                      style={{ textDecoration: "none" }}
+                      color="primaryLight"
+                      fontSize="13px"
+                      aria-label="clear your cart"
+                      role="button"
+                    >
+                      רוקן עגלה
+                      <TrashIcon fill="#003DFF" />
+                    </ChakraButton>
+                  </Flex>
+                  <Spacer h="10px" />
+                  <Flex flexDir="column" justifyContent="space-between" h="full">
+                  <Box overflow="auto" className="slider-container">
+                    <Slider {...settings}>
+                      {cart.products && (
+                        <>
+                          {cart.products.map((p, key) => (
+                            <React.Fragment key={key}>
+                              <NavCartListItem
+                                title={p.product.title}
+                                price={p.product.price}
+                                images={p.product.images}
+                                amount={p.amount}
+                                quantity={p.product.quantity}
+                                onChangeAmount={(amount) =>
+                                  updateProductInCart(
+                                    p.product,
+                                    amount,
+                                    p.amount
+                                  )
+                                }
+                                onDelete={() => {
+                                  const a = window.confirm(
+                                    "האם אתה בטוח שברצונך למחוק את המוצר מהעגלה?"
+                                  );
+                                  if (a) {
+                                    removeProductFromCart(p.product.id);
+                                  }
+                                }}
+                              />
+                            </React.Fragment>
+                          ))}
+                        </>
+                      )}
+                    </Slider>
+
+                  <Spacer h="40px" />
+                  <Flex justifyContent="space-between">
+                    
+                      <Text
+                        fontWeight="500"
+                        fontSize="22px"
+                        color="naturalBlack"
+                        lineHeight="30px"
+                      >
+                        סך הכל
+                      </Text>
+
+                    <Text
+                      fontWeight="500"
+                      fontSize="22px"
+                      lineHeight="30px"
+                      color="naturalBlack"
+                    >
+                      ₪
+                      {(cart.products &&
+                        cart.products.length >= 1 &&
+                        Math.round(
+                          cart.products.reduce(
+                            (a, b) =>
+                              parseFloat(a) +
+                              parseFloat(b.product.price * b.amount),
+                            0
+                          ) * 100
+                        ) / 100) ||
+                        "0"}
+                    </Text>
+                  </Flex>
+                  <Text
+                        color="naturalDark"
+                        fontSize="14px"
+                        lineHeight="22px"
+                      >
+                        משלוח, עמלות ומיסים יחושבו בשעת ההזמנה
+                      </Text>
+                  </Box>
+                  <Box mt="38px" mb="10px">
+                    <Button.Secondary
+                      aria-label="link to keep shoping"
+                      borderColor="primary"
+                      color="primary"
+                      fontSize="20px"
+                      role="button"
+                      onClick={onCartClose}
+                    >
+                      להמשיך בקניות
+                    </Button.Secondary>
+                    <Spacer h="4" />
+                    <Button>
+                      <Flex
+                        alignItems="center"
+                        gap="4"
+                        aria-label="link to pay my cart"
+                        role="button"
+                        onClick={() =>
+                          (window.location.href = routes.ShoppingCart.path)
+                        }
+                      >
+                        לתשלום <ArrowBackIcon />
+                      </Flex>
+                    </Button>
+                  </Box>
+                  </Flex>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
+            <Flex
+              cursor={"pointer"}
+              onClick={onListOpen}
+              justifyContent="center"
+              alignItems="center"
+              role="list"
+            >
+              <MobileList />
+            </Flex>
+            <Modal
+              isOpen={isListOpen}
+              onClose={onListClose}
+              motionPreset="slideInRight"
+              blockScrollOnMount={false}
+            >
+              <ModalOverlay />
+              <ModalContent
+                h="100%"
+                margin="0"
+                minW="300px"
+                w={{ base: "270px", sm: "33%" }}
+                border="none"
+                bg="white"
+                dir="rtl"
+                shadow="0px 5px 40px rgba(0, 0, 0, 0.1)"
+                position="fixed"
+                top="0"
+                right="0"
+                bottom="0"
+                borderRadius="0"
               >
-                <PopoverArrow />
-                <PopoverCloseButton
-                  size="lg"
+                <ModalCloseButton
+                  size="md"
                   color="primary"
                   right="2"
                   //left="100"
@@ -1294,12 +1342,13 @@ export default function NavBar({ withSidebar, logo, change }) {
                   //transform="translateX(-50%)"
                   bg="white"
                 />
-                <PopoverBody py="80px" px="6" dir="rtl">
+                <ModalBody py="80px" px="6" dir="rtl">
                   <Flex
                     flexDir="column"
                     justifyContent="center"
                     gap="30px"
                     dir="rtl"
+                    h="100%"
                   >
                     <ChakraButton
                       h="40px"
@@ -1418,9 +1467,9 @@ export default function NavBar({ withSidebar, logo, change }) {
                       </ChakraButton>
                     </Flex>
                   </Flex>
-                </PopoverBody>
-              </PopoverContent>
-            </Popover>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
           </Flex>
         </Flex>
         <SearchComponent
@@ -1468,6 +1517,44 @@ const MenuItemComponent = ({ path, name, icon, ...rest }) => {
   );
 };
 
+const UserItemComponent = ({ path, name, icon, ...rest }) => {
+  const Icon = icon;
+  const location = useLocation();
+  const [active, setActive] = useState(
+    location.pathname.includes(path) && path !== "/"
+  );
+
+  return (
+    <Link to={path}>
+      <Flex
+        {...rest}
+        cursor="pointer"
+        borderRadius="8px"
+        bg={active ? "othersLight" : "white"}
+        _hover={{ bg: "othersLight", color: "primary" }}
+        onMouseEnter={() => setActive(true)}
+        onMouseLeave={() => setActive(false)}
+        color="naturalDark"
+        h="44px"
+        role="button"
+        alignItems="center"
+        gap="16px"
+        pr="2"
+      >
+          <Icon fill={active ? "#0738D2" : "#91929D"} />
+          <Text
+            textColor={active ? "primary" : "naturalDark"}
+            fontSize="14px"
+            fontWeight="500"
+          >
+            {name}
+          </Text>
+      </Flex>
+    </Link>
+  );
+};
+
+//האם להשתמש בUSEMEMO
 const MenuItemCategory = () => {
   const [topCategories, setTopCategories] = useState([]);
 

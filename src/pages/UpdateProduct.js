@@ -55,6 +55,7 @@ import { getSubcategoriesOfCategory } from "../utils/api/subcategories";
 import { sortAlphabetCategories } from "../utils/sort";
 import Checkbox from "../components/CheckBox";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useAuth } from "../components/Contexts/AuthContext";
 
 export default function CreateProduct() {
   const [loading, setLoading] = useState(false);
@@ -115,7 +116,7 @@ export default function CreateProduct() {
   const [invalidPicture, setInvalidPicture] = useState("");
   const [invalidOpeningPrice, setInvalidOpeningPrice] = useState("");
   // const [invalidPicture, setInvalidPicture] = useState("");
-  const token = window.localStorage.getItem("token");
+  const { isAuthenticated } = useAuth();
 
   const handleDateTimeSubmit = () => {
     if (selectedDate) {
@@ -158,13 +159,13 @@ export default function CreateProduct() {
         openingPrice !== "" &&
         pictures[0]
       ) {
-        if (token === null) return openLogin();
+        if (isAuthenticated) return openLogin();
         setLoading(true);
         const images = mainPicture
           ? [mainPicture, ...pictures.filter((p) => p !== mainPicture)]
           : pictures;
-        const filesOnly = images.map((imageObj) => imageObj.image ||imageObj);
-        console.log(filesOnly)
+        const filesOnly = images.map((imageObj) => imageObj.image || imageObj);
+        console.log(filesOnly);
         let start = startTime;
         if (start === null) {
           const now = new Date();
@@ -172,30 +173,30 @@ export default function CreateProduct() {
         }
         const date = new Date(start);
         date.setDate(date.getDate() + timeFrame);
-        const end = date.toISOString();
-        updateAuctionProduct(
-          id,
-          name,
-          barcode,
+        const endTime = date.toISOString();
+        updateAuctionProduct({
+          title: name,
+          "main-barcode": barcode,
           openingPrice,
-          start,
-          end,
+          startTime: start,
+          endTime,
           timeFrame,
           warranty,
-          subcategory,
+          category: subcategory,
           description,
-          additionalInfo,
+          "additional-information": additionalInfo,
           properties,
           notes,
-          kitInclude,
-          deliveryTime,
-          modelName,
+          "kit-include": kitInclude,
+          "delivery-time": deliveryTime,
+          "model-name": modelName,
           specification,
-          additionalFields,
-          filesOnly,
+          "additional-fields":
+            additionalFields[0].title !== "" ? additionalFields : [],
+          images: filesOnly,
           status,
-          fragile
-        ).then((res) => {
+          fragile,
+        }).then((res) => {
           console.log(res);
           if (res.status === "ok") {
             window.location.href = routes.UserSettingsMySales.path;
@@ -219,35 +220,35 @@ export default function CreateProduct() {
         quantity >= 1 &&
         pictures[0]
       ) {
-        if (token === null) return openLogin();
+        if (isAuthenticated) return openLogin();
         setLoading(true);
         const images = mainPicture
           ? [mainPicture, ...pictures.filter((p) => p !== mainPicture)]
           : pictures;
-        const filesOnly = images.map((imageObj) => imageObj.image ||imageObj);
-        console.log(filesOnly)
-        updateProduct(
-          id,
-          name,
-          barcode,
+        const filesOnly = images.map((imageObj) => imageObj.image || imageObj);
+        console.log(filesOnly);
+        updateProduct({
+          title: name,
+          "main-barcode": barcode,
           price,
-          priceBefore,
+          "price-before-discount": priceBefore,
           warranty,
-          subcategory,
+          category: subcategory,
           description,
-          additionalInfo,
+          "additional-information": additionalInfo,
           properties,
           notes,
-          kitInclude,
+          "kit-include": kitInclude,
           quantity,
-          deliveryTime,
-          modelName,
+          "delivery-time": deliveryTime,
+          "model-name": modelName,
           specification,
-          additionalFields,
-          filesOnly,
+          "additional-fields":
+            additionalFields[0].title !== "" ? additionalFields : [],
+          images: filesOnly,
           status,
-          fragile
-        )
+          fragile,
+        })
           .then((res) => {
             console.log(res);
             if (res.status === "ok") {
@@ -398,8 +399,8 @@ export default function CreateProduct() {
             setOpeningPrice(p.openingPrice);
             setStartTime(new Date(p.startTime));
             setTime(2);
-            setSelectedDate(new Date(p.startTime))
-            setSelectedTime(new Date(p.startTime))
+            setSelectedDate(new Date(p.startTime));
+            setSelectedTime(new Date(p.startTime));
             setTimeFrame(p.timeFrame);
           });
       })
@@ -1609,9 +1610,7 @@ export default function CreateProduct() {
                             _hover={{ bg: "white" }}
                             icon={<CloseIcon />}
                             onClick={() =>
-                              setPictures(
-                                pictures.filter((p) => p !== image)
-                              )
+                              setPictures(pictures.filter((p) => p !== image))
                             }
                           />
                           <Flex
@@ -1620,16 +1619,21 @@ export default function CreateProduct() {
                             alignItems="center"
                           >
                             <Flex dir="ltr" flexDir="column">
-                              <Text fontSize="16px">{image.name || index + 1}</Text>
-                              {image.size && <Text
-                                fontWeight="light"
-                                fontSize="12px"
-                                lineHeight="16px"
-                              >
-                                {Math.ceil(image.size / 1000)}Kb
-                              </Text>}
+                              <Text fontSize="16px">
+                                {image.name || index + 1}
+                              </Text>
+                              {image.size && (
+                                <Text
+                                  fontWeight="light"
+                                  fontSize="12px"
+                                  lineHeight="16px"
+                                >
+                                  {Math.ceil(image.size / 1000)}Kb
+                                </Text>
+                              )}
                             </Flex>
-                            {image.name && image.name.split(".")[1] === "png" ? (
+                            {image.name &&
+                            image.name.split(".")[1] === "png" ? (
                               <Image
                                 h="28px"
                                 alt="an icon of png file"
@@ -1693,7 +1697,7 @@ export default function CreateProduct() {
                     עדכן מוצר
                   </Bbutton>
 
-      {/*<IconButton
+                  {/*<IconButton
                     w={{ base: "60px", md: "64px" }}
                     h={{ base: "60px", md: "64px" }}
                     bg={{ base: "primaryLightest", md: "naturalLightest" }}

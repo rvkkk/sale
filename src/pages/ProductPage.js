@@ -87,7 +87,7 @@ const tabs = [
   { 
     name: "המלצות", 
     component: LazyTab2Component,
-    props: { productId: product.id },
+    props: { productId: product._id },
   },
   {
     name: "משלוחים והחזרות",

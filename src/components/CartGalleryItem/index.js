@@ -12,35 +12,34 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useState, memo, useMemo, useEffect } from "react";
 import { HeartIcon, HeartFullIcon } from "../Icons";
 import { routes } from "../../routes";
 import Badge from "../Badge";
 import Button from "../Button";
 import ProductBuyCard from "../ProductBuyCard";
 import ProductTimeClock from "../ProductTimeClock";
-//import { deleteProduct } from "../../utils/api/products";
-import { addToWishList, removeFromWishList } from "../../utils/wishList";
-import { addNewWish, deleteFromWishList } from "../../utils/api/wishLists";
 import { addOffer } from "../../utils/api/offers";
 import { useDisclosure } from "@chakra-ui/react";
+import { useWishList } from "../Contexts/WishListContext";
 
-export default function CartItemGallery(props) {
+export default memo(function CartItemGallery(props) {
   const [inWishList, setInWishList] = useState(false);
-  const token = window.localStorage.getItem("token");
+  const { addProductToWishList,
+    removeProductFromWishList } = useWishList()
   const product = props.data;
   const [hover, setHover] = useState(false);
   const { onOpen, onClose, isOpen } = useDisclosure();
 
-  const addNewOffer = (price) => {
+  const addNewOffer = useMemo((price) => {
     addOffer(product._id, price)
       .then((res) => {
         console.log(res);
       })
       .catch((err) => console.log(err));
-  };
+  }, [product._id]);
 
-  const addWish = () => {
+ /* const addWish = () => {
     if (token === null)
       addToWishList({
         product: {
@@ -247,7 +246,7 @@ export default function CartItemGallery(props) {
                   <>
                     {product.openingPrice ? (
                       <>
-                        {product.winningPrice === 0 ? (
+                        {product.winningPrice === 0 && new Date(product.endTime) > new Date() ? (
                           <Box>
                             <Popover
                               postion="relative"
@@ -257,7 +256,7 @@ export default function CartItemGallery(props) {
                               placement="top"
                               isOpen={isOpen}
                               onOpen={onOpen}
-                              onClose={onClose}
+                              onClose={(e) => {e.stopPropagation(); onClose()}}
                               closeOnBlur={false}
                             >
                               <PopoverTrigger>
@@ -271,6 +270,8 @@ export default function CartItemGallery(props) {
                                   h={{ base: "50px", xl: "60px" }}
                                   fontSize={{base: "18px", md: "16px", lg:  "18px"}}
                                   lineHeight="20px"
+                                  onClick={(e) => {//להעביר לסל קניות?
+                                    e.stopPropagation();}}
                                 >
                                   הצע מחיר
                                 </Button>
@@ -316,7 +317,7 @@ export default function CartItemGallery(props) {
                           h={{ base: "50px", xl: "60px" }}
                           fontSize="18px"
                           lineHeight="20px"
-                          onClick={(e) => {
+                          onClick={(e) => {//להעביר לסל קניות?
                             e.stopPropagation();
                             window.location.href = product.openingPrice
                               ? routes.ProductPageAuction.path.replace(
@@ -393,9 +394,9 @@ export default function CartItemGallery(props) {
                     fontSize="25"
                   >
                     {!inWishList ? (
-                      <HeartIcon onClick={addWish} />
+                      <HeartIcon onClick={() => { addProductToWishList(product, 1); setInWishList(true)}} />
                     ) : (
-                      <HeartFullIcon onClick={removeWish} />
+                      <HeartFullIcon onClick={() => { removeProductFromWishList(product._id); setInWishList(false)}} />
                     )}
                   </IconButton>
                 </Tooltip>
@@ -430,7 +431,7 @@ export default function CartItemGallery(props) {
             </Box>
           )}
           <Flex
-            mt={!product.openingPrice && "3"}
+            mt={!product.openingPrice && "30px"}
             gap="10px"
             flexDir="column"
             justifyContent="center"
@@ -500,7 +501,7 @@ export default function CartItemGallery(props) {
               <>
                 {product.openingPrice ? (
                   <>
-                    {product.winningPrice === 0 ? (
+                    {product.winningPrice === 0 && new Date(product.endTime) > new Date() ? (
                       <Box>
                         <Popover
                           postion="relative"
@@ -623,9 +624,9 @@ export default function CartItemGallery(props) {
                     fontSize="25"
                   >
                     {!inWishList ? (
-                      <HeartIcon onClick={addWish} />
+                      <HeartIcon onClick={() => { addProductToWishList(product, 1); setInWishList(true)}} />
                     ) : (
-                      <HeartFullIcon onClick={removeWish} />
+                      <HeartFullIcon onClick={() => { removeProductFromWishList(product._id); setInWishList(false)}} />
                     )}
                   </IconButton>
                 </Tooltip>
@@ -636,4 +637,4 @@ export default function CartItemGallery(props) {
       </>
     );
   }
-}
+})

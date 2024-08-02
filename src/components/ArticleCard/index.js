@@ -1,7 +1,7 @@
 import { Flex, Image, Text} from "@chakra-ui/react";
-import React from "react";
+import React, { memo } from "react";
 
-export default function ArticleCard({ imageUrl, text, onClick }) {
+export default memo(function ArticleCard({ imageUrl, text, onClick }) {
   return (
     <Flex
       w={{base: "320px", sm: "410px", md: "360px", lg: "410px", xl: "380px", "2xl": "410px"}}
@@ -29,4 +29,4 @@ export default function ArticleCard({ imageUrl, text, onClick }) {
       </Text>
     </Flex>
   );
-}
+})

@@ -29,36 +29,27 @@ import QuantityInput from "../QuantityInput";
 import { TiArrowForwardOutline } from "react-icons/ti";
 import { CheckCircleIcon, WarningIcon } from "@chakra-ui/icons";
 import { routes } from "../../routes";
-import {
-  getCart,
-  removeFromCart,
-  clearCart,
-  addToCart,
-} from "../../utils/cart";
-import {
-  getUserCart,
-  deleteFromCart,
-  updateCart,
-  deleteCart,
-} from "../../utils/api/carts";
 import { getCoupon } from "../../utils/api/coupons";
 import Loader from "../Loader";
+import { useCart } from "../Contexts/CartContext";
 
 export default function Tab1(props) {
   const [loading, setLoading] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState({});
-  const [id, setId] = useState(0);
-  const [coupon, setCoupon] = useState("");
-  const [validCoupon, setValidCoupon] = useState(false);
-  const [invalidCoupon, setInvalidCoupon] = useState(false);
-  const [discount, setDiscount] = useState(0);
+  //const [products, setProducts] = useState([]);
+  //const [id, setId] = useState(0);
+  //const [coupon, setCoupon] = useState("");
+  //const [validCoupon, setValidCoupon] = useState(false);
+  //const [invalidCoupon, setInvalidCoupon] = useState(false);
+  //const [discount, setDiscount] = useState(0);
   const [checkedProducts, setCheckedProducts] = useState(props.products);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
-  const token = window.localStorage.getItem("token");
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { cart,
+    updateProductInCart,
+    removeProductFromCart,
+    deleteMyCart } = useCart();
 
-  const updateAmount = (product, newAmount, amount) => {
+  /*const updateAmount = (product, newAmount, amount) => {
     if (token === null)
       addToCart({ product: product, amount: newAmount - amount })
         .then((res) => {
@@ -160,9 +151,9 @@ export default function Tab1(props) {
           console.log(err);
           // setLoading(false);
         });
-  };
+  };*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     setLoading(true);
     if (token !== null) {
       getUserCart()
@@ -181,16 +172,16 @@ export default function Tab1(props) {
         setLoading(false);
       });
     }
-  }, [token]);
+  }, [token]);*/
 
   useEffect(() => {
     console.log(
-      checkedProducts.length === products.length && products.length > 0
+      checkedProducts.length === cart.products.length && cart.products.length > 0
     );
     setSelectAllChecked(
-      checkedProducts.length === products.length && products.length > 0
+      checkedProducts.length === cart.products.length && cart.products.length > 0
     );
-  }, [checkedProducts, products]);
+  }, [checkedProducts, cart]);
 
   const removeDecimal = (num) => {
     try {
@@ -200,7 +191,7 @@ export default function Tab1(props) {
     }
   };
 
-  const handleCoupon = () => {
+  /*const handleCoupon = () => {
     if (coupon !== "") {
       getCoupon(coupon)
         .then((res) => {
@@ -212,7 +203,7 @@ export default function Tab1(props) {
         })
         .catch((err) => console.log(err));
     }
-  };
+  };*/
 
   return (
     <>
@@ -221,7 +212,7 @@ export default function Tab1(props) {
         <Loader />
       ) : (
         <Box mx="10%">
-          {products[0] ? (
+          {cart.products[0] ? (
             <>
               <Flex gap="8" dir="rtl" mt="10">
                 <Flex flex="1" flexDir="column" gap="4">
@@ -257,7 +248,7 @@ export default function Tab1(props) {
                               checked={selectAllChecked}
                               onChange={() => {
                                 setCheckedProducts(
-                                  selectAllChecked ? [] : products // בחירת כל המוצרים או ביטול בחירתם
+                                  selectAllChecked ? [] : cart.products // בחירת כל המוצרים או ביטול בחירתם
                                 );
                               }}
                               /*checked={
@@ -291,8 +282,8 @@ export default function Tab1(props) {
                         </Tr>
                       </Thead>
                       <Tbody w="full">
-                        {products &&
-                          products.map((product) => {
+                        {cart.products &&
+                          cart.products.map((product) => {
                             return (
                               <Tr
                                 borderRadius="12px"
@@ -424,7 +415,7 @@ export default function Tab1(props) {
                                     value={product.amount}
                                     limit={product.product.quantity}
                                     onChange={(amount) =>
-                                      updateAmount(
+                                      updateProductInCart(
                                         product.product,
                                         amount,
                                         product.amount
@@ -504,7 +495,7 @@ export default function Tab1(props) {
                     >
                       סיכום הזמנה
                     </Text>
-                    <Input
+          {/*<Input
                       borderRadius="12px"
                       //border="2px primary"
                       borderColor={
@@ -552,7 +543,7 @@ export default function Tab1(props) {
                       }
                       label="יש לכם קוד קופון?"
                       labelFontWeight="normal"
-                    />
+                    />*/}
                     <Flex flexDir="column" gap="2">
                       {/*products &&
                     products.map((product) => {
@@ -590,16 +581,16 @@ export default function Tab1(props) {
                             : "יחושב במעמד התשלום"}
                         </Text>
                       </Flex>
-                      <Flex fontSize="16px" justifyContent="space-between">
+                      {/*<Flex fontSize="16px" justifyContent="space-between">
                         <Text>עמלה</Text>
                         <Text>₪3.25</Text>
                       </Flex>
-                      <Flex fontSize="16px" justifyContent="space-between">
+                     {/* <Flex fontSize="16px" justifyContent="space-between">
                         <Text>הנחה קופון</Text>
                         <Text dir="ltr" color="otherError">
                           ₪{discount}
                         </Text>
-                      </Flex>
+                      </Flex>*/}
                       <Spacer h="2" />
                       <Divider h="2px" bg="naturalLight" />
                       <Spacer h="12px" />
@@ -645,7 +636,8 @@ export default function Tab1(props) {
                     <Button
                       onClick={() =>
                         checkedProducts.length >= 1 &&
-                        props.proceedToCheckout(checkedProducts, discount)
+                        //props.proceedToCheckout(checkedProducts, discount)
+                        props.proceedToCheckout(checkedProducts)
                       }
                     >
                       <Flex alignItems="center" gap="6">
@@ -781,7 +773,7 @@ export default function Tab1(props) {
                     color="white"
                     bg="primary"
                     onClick={() => {
-                      deleteAll();
+                      deleteMyCart();
                       return onClose();
                     }}
                   >

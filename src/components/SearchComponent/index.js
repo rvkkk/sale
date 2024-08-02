@@ -16,13 +16,14 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Icon5, SearchIcon } from "../Icons";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { routes } from "../../routes";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { getProductsByLetters } from "../../utils/api/products";
 import { SearchRounded } from "@mui/icons-material";
 import Button from "../Button";
+import { getAllProductsByLetters } from "../../utils/api/allProducts";
 
 export default function SearchComponent() {
   const [query, setQuery] = useState("");
@@ -38,13 +39,13 @@ export default function SearchComponent() {
     }
   }, [query]);
 
-  const searchProducts = (letters) => {
-    getProductsByLetters(letters).then((products) => {
+  const searchProducts = useCallback((letters) => {
+    getProductsByLetters(letters, 1, 10).then((products) => {
       setProducts(products.products);
       setShow(products.products.length > 0);
       console.log(products);
     });
-  };
+  }, []);
 
   const settings = {
     dots: true,
@@ -200,12 +201,15 @@ export default function SearchComponent() {
         />
       </Flex>
       {show && (
-        <Box
+        <Flex
           dir="rtl"
+          flexDir="column"
           position="absolute"
           top={{ base: "100%", lg: "auto" }}
+          right={{ base: "18px", sm: "88px", lg: "auto" }}
+          left={{ base: "18px", sm: "88px", lg: "auto" }}
           mt="5px"
-          w={{ base: "100%", lg: "530px", xl: "700px", "2xl": "800px" }}
+          w={{ lg: "530px", xl: "700px", "2xl": "800px" }}
           bg="white"
           boxShadow="0px 1px 54px rgba(35, 38, 59, 0.2)"
           borderRadius="12px"
@@ -236,7 +240,7 @@ export default function SearchComponent() {
               <Text textColor="primary">לכל התוצאות</Text>
             </Flex>
           </Link>
-        </Box>
+        </Flex>
       )}
     </>
   );

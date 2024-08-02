@@ -9,11 +9,6 @@ const axiosInstance = axios.create({
 });
 // {withCredentials: true, headers: {'Content-Type': 'application/json'}}
 
-const onTokenBroken = () => {
-  localStorage.removeItem("token");
-  //window.location.href = "/auth/login";
-};
-
 /*const handleError = (error, message) => {
   console.error(message, error);
   if (error.response && error.response.status === 401) {
@@ -42,7 +37,7 @@ export const checkIfUserExists = (input) => {
 
 export const sendEmailAuth = (email) => {
   return axiosInstance.patch('send_code', { email })
-    .then(res => res.data)
+    .then(res => res)
     .catch(err => {
       throw err;
     });
@@ -69,7 +64,6 @@ export const signup = (userData) => {
     .then(res => res.data)
     .catch(err => {
       console.log(err);
-      onTokenBroken();
       throw err;
     });
 };
@@ -132,7 +126,6 @@ export const googleLogin = (email) => {
   return axiosInstance.patch('google-login', { email })
     .then(res => res.data)
     .catch(err => {
-      onTokenBroken();
       throw err;
     });
 };

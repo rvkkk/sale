@@ -9,13 +9,13 @@ const axiosInstance = axios.create({
 
 const createFormData = (data) => {
   const formData = new FormData();
-  Object.keys(data).forEach(key => {
-    if (Array.isArray(data[key])) {
-      data[key].forEach(item => formData.append(key, item));
-    } else if (key === 'additional-fields') {
+  Object.keys(data).forEach((key) => {
+    if (key === "additional-fields") {
       const json = JSON.stringify(data[key]);
       const blob = new Blob([json]);
       formData.append(key, blob);
+    } else if (Array.isArray(data[key])) {
+      data[key].forEach((item) => formData.append(key, item));
     } else {
       formData.append(key, data[key]);
     }
@@ -24,7 +24,7 @@ const createFormData = (data) => {
 };
 
 export const getProduct = (id) => {
-  return axiosInstance.get(`products/${id}`)
+  return axios.get(`${baseURL}products/${id}`)
     .then(res => res.data)
     .catch(err => {
       console.error("Error fetching product:", err);
@@ -89,7 +89,7 @@ export const deleteProduct = (id) => {
 };
 
 export const getProducts = (page = 1, limit = 30) => {
-  return axiosInstance.get(`products?page=${page}&limit=${limit}`)
+  return axios.get(`${baseURL}products?page=${page}&limit=${limit}`)
     .then(res => res.data)
     .catch(err => {
       console.error("Error fetching products:", err);
@@ -98,7 +98,7 @@ export const getProducts = (page = 1, limit = 30) => {
 };
 
 export const getProductsByCategory = (category, page = 1, limit = 30) => {
-  return axiosInstance.get(`products-category/${category}?page=${page}&limit=${limit}`)
+  return axios.get(`${baseURL}products-category/${category}?page=${page}&limit=${limit}`)
     .then(res => res.data)
     .catch(err => {
       console.error("Error fetching products by category:", err);
@@ -107,7 +107,7 @@ export const getProductsByCategory = (category, page = 1, limit = 30) => {
 };
 
 export const getProductsByMainCategory = (category, page = 1, limit = 30) => {
-  return axiosInstance.get(`products-main-category/${category}?page=${page}&limit=${limit}`)
+  return axios.get(`${baseURL}products-main-category/${category}?page=${page}&limit=${limit}`)
     .then(res => res.data)
     .catch(err => {
       console.error("Error fetching products by main category:", err);
@@ -116,7 +116,7 @@ export const getProductsByMainCategory = (category, page = 1, limit = 30) => {
 };
 
 export const getProductsByLetters = (letters, page = 1, limit = 10) => {
-  return axiosInstance.get(`products-by-letters?query=${letters}&page=${page}&limit=${limit}`)
+  return axios.get(`${baseURL}products-by-letters?query=${letters}&page=${page}&limit=${limit}`)
     .then(res => res.data)
     .catch(err => {
       console.error("Error fetching products by letters:", err);
@@ -125,7 +125,7 @@ export const getProductsByLetters = (letters, page = 1, limit = 10) => {
 };
 
 export const searchProducts = (searchData) => {
-  return axiosInstance.patch('search-products', searchData)
+  return axios.post(`${baseURL}search-products`, searchData)
     .then(res => res.data)
     .catch(err => {
       console.error("Error searching products:", err);

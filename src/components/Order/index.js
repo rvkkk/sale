@@ -96,7 +96,7 @@ export default function Order({
                 <Text fontSize="16px" color="naturalDark">
                 {data.amount}x
                 </Text>
-                <Text fontSize="16px">₪{removeDecimal(data.product.price * (100 - data.product.discount)/100)}</Text>
+                <Text fontSize="16px">₪{data.product.price}</Text>
               </Flex>
             </Flex>
           </Flex>
@@ -107,7 +107,7 @@ export default function Order({
                 סך הכול
               </Text>
               <Text fontSize="22px" fontWeight="semiBold">
-                ₪{removeDecimal((data.product.price * (100 - data.product.discount)/100) * data.amount)}
+                ₪{data.product.price * data.amount}
               </Text>
             </Box>
 

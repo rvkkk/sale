@@ -1,81 +1,62 @@
 import axios from "axios";
 
-const baseURL = "https://sale-bid.df.r.appspot.com/";
+const baseURL = "http://localhost:3001/"//"https://sale-bid.df.r.appspot.com/";
+
+const axiosInstance = axios.create({
+  baseURL,
+  withCredentials: true
+});
 
 export const searchArticles = (search) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}articles-search?q=${search}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  return axios.get(`${baseURL}articles-search?q=${search}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error searching articles:", err);
+      throw err;
+    });
 };
 
 export const getArticles = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}articles`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  return axios.get(`${baseURL}articles`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching articles:", err);
+      throw err;
+    });
 };
 
 export const getArticle = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}articles/${id}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  return axios.get(`${baseURL}articles/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching article:", err);
+      throw err;
+    });
 };
 
-export const addArticle = ({ title, description, content, icon }) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(`${baseURL}articles`, { title, description, content, icon })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+export const addArticle = (articleData) => {
+  return axiosInstance.post('articles', articleData)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error adding article:", err);
+      throw err;
+    });
 };
 
-export const updateArticle = ({ id, title, description, content, icon }) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}articles/${id}`, { title, description, content, icon })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+export const updateArticle = (id, articleData) => {
+  return axiosInstance.patch(`articles/${id}`, articleData)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error updating article:", err);
+      throw err;
+    });
 };
 
 export const deleteArticle = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}articles/${id}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
+  return axiosInstance.delete(`articles/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error deleting article:", err);
+      throw err;
+    });
 };
