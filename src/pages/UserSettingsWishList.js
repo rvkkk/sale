@@ -4,142 +4,111 @@ import { TrashIcon } from "../components/Icons";
 import Layout from "../components/Layout";
 import Order from "../components/Order";
 import Loader from "../components/Loader";
-import {
-  getUserWishList,
-  deleteWishList,
-  deleteFromWishList,
-} from "../utils/api/wishLists";
-import {
-  getWishList,
-  removeFromWishList,
-  clearWishList,
-} from "../utils/wishList";
-
-import { addCart } from "../utils/api/carts";
-import { addToCart } from "../utils/cart";
+import { useWishList } from "../components/Contexts/WishListContext"
 import Button from "../components/Button";
+//import { useAuth } from "../components/Contexts/AuthContext";
+import { useCart } from "../components/Contexts/CartContext";
 
 export default function UserSettingsWishList() {
   const [loading, setLoading] = useState(false);
-  const [wishList, setWishList] = useState([]);
-  const [id, setId] = useState(0);
-  const token = window.localStorage.getItem("token");
+  //const [wishList, setWishList] = useState([]);
+  const {wishList, fetchWishList, deleteMyWishList, removeProductFromWishList} = useWishList();
+  const {addProductToCart} = useCart();
 
-  useEffect(() => {
-    setLoading(true);
-    if (token !== null) {
-      getUserWishList()
-        .then((res) => {
-          setWishList(res.wishList.products);
-          setId(res.wishList.id);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
-        });
-    } else {
-      getWishList()
-        .then((res) => {
-          console.log(res);
-          setWishList(res.products);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
-        });
-    }
-  }, [token]);
+  // useEffect(()  => {
+    // setLoading(true);
+    // fetchWishList();
+    // setLoading(false);
+    // }, [fetchWishList]);
 
-  const deleteAll = () => {
-    setLoading(true);
-    if (id !== 0) {
-      deleteWishList(id)
-        .then((res) => {
-          console.log(res);
-          setWishList([]);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
-        });
-    } else
-      clearWishList()
-        .then((res) => {
-          setWishList([]);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
-        });
-  };
+  // const deleteAll = () => {
+  //   setLoading(true);
+  //   if (id !== 0) {
+  //     deleteWishList(id)
+  //       .then((res) => {
+  //         console.log(res);
+  //         setWishList([]);
+  //         setLoading(false);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //         setLoading(false);
+  //       });
+  //   } else
+  //     clearWishList()
+  //       .then((res) => {
+  //         setWishList([]);
+  //         setLoading(false);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //         setLoading(false);
+  //       });
+  // };
 
-  const removeProductFromWishList = (productId) => {
-    if (token === null)
-      removeFromWishList({ productId })
-        .then((res) => {
-          setWishList((prevWishList) => {
-            const updatedProducts = prevWishList.filter(
-              (w) => !(w.product.id === productId)
-            );
-            return updatedProducts;
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    else
-      deleteFromWishList(productId)
-        .then((res) => {
-          setWishList((prevWishList) => {
-            const updatedProducts = prevWishList.filter(
-              (w) => !(w.product.id === productId)
-            );
-            return updatedProducts;
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-  };
+  // const removeProductFromWishList = (productId) => {
+  //   if (token === null)
+  //     removeFromWishList({ productId })
+  //       .then((res) => {
+  //         setWishList((prevWishList) => {
+  //           const updatedProducts = prevWishList.filter(
+  //             (w) => !(w.product.id === productId)
+  //           );
+  //           return updatedProducts;
+  //         });
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   else
+  //     deleteFromWishList(productId)
+  //       .then((res) => {
+  //         setWishList((prevWishList) => {
+  //           const updatedProducts = prevWishList.filter(
+  //             (w) => !(w.product.id === productId)
+  //           );
+  //           return updatedProducts;
+  //         });
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  // };
 
-  const addProductToCart = (product, amount) => {
-    if (token === null)
-      addToCart({
-        product: {
-          id: product.id,
-          title: product.title,
-          "english-title": product["english-title"],
-          description: product.description,
-          "english-description": product["english-description"],
-          price: product.price,
-          "price-before-discount": product["price-before-discount"],
-          cateegory: product.category,
-          quantity: product.quantity,
-          images: product.images,
-          "shipping-cost": product["shipping-cost"],
-          pin: product.pin,
-        },
-        amount,
-      })
-        .then((res) => {
-          console.log("added:", res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    else
-      addCart({ productId: product.id, amount })
-        .then((res) => {
-          console.log(res); //האם למחוק מרשימת המשאלות כאשר בסל?
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-  };
+  // const addProductToCart = (product, amount) => {
+  //   if (token === null)
+  //     addToCart({
+  //       product: {
+  //         id: product.id,
+  //         title: product.title,
+  //         "english-title": product["english-title"],
+  //         description: product.description,
+  //         "english-description": product["english-description"],
+  //         price: product.price,
+  //         "price-before-discount": product["price-before-discount"],
+  //         cateegory: product.category,
+  //         quantity: product.quantity,
+  //         images: product.images,
+  //         "shipping-cost": product["shipping-cost"],
+  //         pin: product.pin,
+  //       },
+  //       amount,
+  //     })
+  //       .then((res) => {
+  //         console.log("added:", res);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   else
+  //     addCart({ productId: product.id, amount })
+  //       .then((res) => {
+  //         console.log(res); //האם למחוק מרשימת המשאלות כאשר בסל?
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  // };
 
   return (
     <Layout withSidebar>
@@ -147,7 +116,7 @@ export default function UserSettingsWishList() {
         <Loader />
       ) : (
         <>
-          <Box py="20" ml="15%">
+          <Box py="20" mx="15%">
             <Flex alignItems="center" justifyContent="space-between">
               <Text
                 fontSize="32px"
@@ -159,10 +128,10 @@ export default function UserSettingsWishList() {
               </Text>
             </Flex>
             <Spacer h="5" />
-            {wishList.length > 0 ? (
+            {wishList.products.length > 0 ? (
               <>
                 <Flex flexDir="column" gap="4" mt="8">
-                  {wishList.map((wish, key) => {
+                  {wishList.products.map((wish, key) => {
                     return (
                       <Order
                         key={key}
@@ -202,7 +171,7 @@ export default function UserSettingsWishList() {
                 <Flex justifyContent="end">
                   <Button.TextButton
                     color="naturalBlack"
-                    onClick={() => deleteAll()}
+                    onClick={() => deleteMyWishList()}
                     fontSize="16px"
                     lineHeight="18px"
                   >

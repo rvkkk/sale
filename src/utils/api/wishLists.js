@@ -56,6 +56,15 @@ export const addNewWish = (payload) => {
     });
 };
 
+export const addLocalWishList = (payload) => {
+  return axiosInstance.post('wish-lists-add-local', payload)
+  .then(res => res.data)
+  .catch(err => {
+    console.error("Error adding local wish:", err);
+    throw err;
+  });
+  };
+
 export const updateWishList = (payload) => {
   return axiosInstance.patch('wish-lists', payload)
     .then(res => res.data)

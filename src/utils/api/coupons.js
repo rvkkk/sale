@@ -4,14 +4,9 @@ const baseURL = "https://sale-bid.df.r.appspot.com/";
 
 export const getCoupons = () => {
   return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}coupons`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
+    axios.get(`${baseURL}coupons`)
+      .then(res => { resolve(res.data) })
+      .catch((err) => { reject(err) });
   });
 };
 

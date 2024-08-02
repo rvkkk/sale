@@ -49,6 +49,7 @@ import { getSubcategoriesOfCategory } from "../utils/api/subcategories";
 import { sortAlphabetCategories } from "../utils/sort";
 import Checkbox from "../components/CheckBox";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useAuth } from "../components/Contexts/AuthContext";
 
 export default function CreateProduct() {
   const [loading, setLoading] = useState(false);
@@ -108,7 +109,7 @@ export default function CreateProduct() {
   const [invalidPicture, setInvalidPicture] = useState("");
   const [invalidOpeningPrice, setInvalidOpeningPrice] = useState("");
   // const [invalidPicture, setInvalidPicture] = useState("");
-  const token = window.localStorage.getItem("token");
+  const {isAuthenticated} = useAuth();
 
   const handleDateTimeSubmit = useCallback(() => {
     if (selectedDate) {
@@ -130,9 +131,9 @@ export default function CreateProduct() {
       setStartTime(fullDateTime.toISOString());
       console.log("Selected Date & Time:", fullDateTime);
     }
-  },[selectedDate, selectedTime])
+  }, [selectedDate, selectedTime]);
 
-  const createProduct = () => {
+  const createProduct = (active) => {
     if (category === "") setInvalidMainCategory("שדה חובה");
     if (subcategory === "") setInvalidCategory("שדה חובה");
     if (name === "") setInvalidName("שדה חובה");
@@ -151,7 +152,7 @@ export default function CreateProduct() {
         openingPrice !== "" &&
         pictures[0]
       ) {
-        if (token === null) return openLogin();
+        if (!isAuthenticated) return openLogin();
         setLoading(true);
         const images = mainPicture.url
           ? [mainPicture, ...pictures.filter((p) => p.url !== mainPicture.url)]
@@ -168,29 +169,31 @@ export default function CreateProduct() {
         }
         const date = new Date(start);
         date.setDate(date.getDate() + timeFrame);
-        const end = date.toISOString();
-        addAuctionProduct(
-          name,
-          barcode,
+        const endTime = date.toISOString();
+        addAuctionProduct({
+          title: name,
+          "main-barcode": barcode,
           openingPrice,
-          start,
-          end,
+          startTime: start,
+          endTime,
           timeFrame,
           warranty,
-          subcategory,
+          category: subcategory,
           description,
-          additionalInfo,
+          "additional-information": additionalInfo,
           properties,
           notes,
-          kitInclude,
-          deliveryTime,
-          modelName,
+          "kit-include": kitInclude,
+          "delivery-time": deliveryTime,
+          "model-name": modelName,
           specification,
-          additionalFields[0].title !== "" ? additionalFields : [],
-          filesOnly,
+          "additional-fields":
+            additionalFields[0].title !== "" ? additionalFields : [],
+          images: filesOnly,
           status,
-          fragile
-        ).then((res) => {
+          fragile,
+          active
+        }).then((res) => {
           console.log(res);
           if (res.status === "ok") {
             window.localStorage.removeItem("new product");
@@ -199,6 +202,11 @@ export default function CreateProduct() {
             setLoading(false);
             alert("שגיאה ביצירת מכירה חדשה");
           }
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+          alert("שגיאה ביצירת מכירה חדשה");
         });
       } else return openFillAll();
     } else {
@@ -215,7 +223,7 @@ export default function CreateProduct() {
         quantity >= 1 &&
         pictures[0]
       ) {
-        if (token === null) return openLogin();
+        if (!isAuthenticated) return openLogin();
         setLoading(true);
         const images = mainPicture.url
           ? [mainPicture, ...pictures.filter((p) => p.url !== mainPicture.url)]
@@ -226,27 +234,29 @@ export default function CreateProduct() {
           const file = base64ToFile(image, name, size, type);
           filesOnly.push(file);
         });
-        addProduct(
-          name,
-          barcode,
+        addProduct({
+          title: name,
+          "main-barcode": barcode,
           price,
-          priceBefore,
+          "price-before-discount": priceBefore,
           warranty,
-          subcategory,
+          category: subcategory,
           description,
-          additionalInfo,
+          "additional-information": additionalInfo,
           properties,
           notes,
-          kitInclude,
+          "kit-include": kitInclude,
           quantity,
-          deliveryTime,
-          modelName,
+          "delivery-time": deliveryTime,
+          "model-name": modelName,
           specification,
-          additionalFields[0].title !== "" ? additionalFields : [],
-          filesOnly,
+          "additional-fields":
+            additionalFields[0].title !== "" ? additionalFields : [],
+          images: filesOnly,
           status,
-          fragile
-        )
+          fragile,
+          active
+        })
           .then((res) => {
             console.log(res);
             if (res.status === "ok") {
@@ -266,7 +276,6 @@ export default function CreateProduct() {
     }
   };
 
-  // המרת Blob (או File) למחרוזת Base64
   const blobToBase64 = (blob) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -276,7 +285,6 @@ export default function CreateProduct() {
     });
   };
 
-  // המרת מחרוזת Base64 לאובייקט File
   const base64ToFile = (base64, name, size, type) => {
     const base64Data = base64.split(",")[1];
     // המרת המחרוזת Base64 למערך של בתים (bytes)
@@ -1219,7 +1227,7 @@ export default function CreateProduct() {
                         >
                           התחל מיידית
                         </Button>
-                        <Popover closeOnBlur={false}>
+                        <Popover>
                           {({ onClose }) => (
                             <>
                               <PopoverTrigger>
@@ -1762,7 +1770,7 @@ export default function CreateProduct() {
                       h={{ base: "60px", md: "64px" }}
                       bg={{ base: "primaryLight", md: "primary" }}
                       borderRadius={{ base: "14px", md: "12px" }}
-                      onClick={() => createProduct()}
+                      onClick={() => createProduct("ממתין לאישור")}
                     >
                       הפעל מכירה
                     </Bbutton>
@@ -1776,6 +1784,7 @@ export default function CreateProduct() {
                       w="278px"
                       h={{ base: "60px", md: "64px" }}
                       fontSize="20px"
+                      onClick={() => createProduct("עתידי")}
                     >
                       שמור למועד מאוחר יותר
                     </Bbutton.Secondary>

@@ -1,3 +1,4 @@
+/* eslint-disable use-isnan */
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
 const baseURL = "http://localhost:3001/";
@@ -67,23 +68,68 @@ export const AuthProvider = ({ children }) => {
     const verifyAuth = async () => {
       try {
         const response = await axios.get(`${baseURL}user-token`, {
-          withCredentials: true
+          withCredentials: true,
         });
         setIsAuthenticated(response.data.status === "ok");
-        console.log(response.data.status === "ok")
+        console.log(response.data.status === "ok");
       } catch (error) {
-        console.error("Authentication verification failed:", error);
-        setIsAuthenticated(false);
+        if (error.response && error.response.status === 401) {
+          console.log("Token expired, attempting to refresh...");
+          refreshAuth();
+        } else {
+          console.error("Authentication verification failed:", error);
+          setIsAuthenticated(false);
+        }
       }
     };
-
+    // console.log(majorityElement([3, 2, 3]));
     verifyAuth();
+  }, []);
+
+  /*const ilends = (ilends) => {
+    let num = 0;
+    for (let i = 0; i < ilends.length; i++) {
+      for (let j = 0; j < ilends[0].length; j++) {
+        if (ilends[i][j] === "1")
+          if (j === 0) {
+            if (i === 0) num++;
+            else if (ilends[i - 1][j] === "0") num++;
+          } else if (i === 0) {
+            if (ilends[i][j - 1] === "0") num++;
+          } else if (ilends[i][j - 1] === "0" && ilends[i - 1][j] === "0")
+            num++;
+      }
+    }
+    return num;
+  };
+  useEffect(
+    () =>
+      console.log(
+        ilends([
+          ["1","1","0","0","0"],
+          ["1","1","0","0","0"],
+          ["0","0","1","0","0"],
+          ["0","0","0","1","1"]
+        ])
+      ),
+    []
+  );*/
+
+  const logout = useCallback(async () => {
+    try {
+      await axios.post(`${baseURL}logout`, {}, { withCredentials: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setIsAuthenticated(false);
+      window.location.href = "/";
+    }
   }, []);
 
   const refreshAuth = useCallback(async () => {
     try {
       const response = await axios.get(`${baseURL}user-refresh-token`, {
-        withCredentials: true
+        withCredentials: true,
       });
       setIsAuthenticated(response.data.status === "ok");
     } catch (error) {
@@ -103,7 +149,9 @@ export const AuthProvider = ({ children }) => {
   }, [isAuthenticated, refreshAuth]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, refreshAuth }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, setIsAuthenticated, refreshAuth, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

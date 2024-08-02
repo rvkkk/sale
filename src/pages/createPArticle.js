@@ -14,11 +14,13 @@ import { routes } from "../routes";
 
 export default function CreatePArticle() {
   const [auction, setAuction] = useState(true);
+
   useEffect(() => {
     const num = window.location.href.split("/").pop().split("/")[0];
     console.log(num);
-    num === 1 && setAuction(false);
-  });
+    num === "1" && setAuction(false);
+  }, []);
+
   return (
     <Layout>
       <Box
@@ -28,7 +30,7 @@ export default function CreatePArticle() {
       >
         <Flex justifyContent="center" mb="8">
           <Heading fontSize="24px" color="primary">
-            העלאת מוצר למכירה רגילה באתר Sale Bid
+            העלאת מוצר למכירה{!auction ? " רגילה" : " פומבית"} באתר Sale Bid
           </Heading>
         </Flex>
 

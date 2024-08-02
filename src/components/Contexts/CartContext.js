@@ -3,6 +3,7 @@ import axios from "axios";
 import {
   addCart,
   addLocalCart,
+  updateCart,
   deleteCart,
   deleteFromCart,
   getUserCart,
@@ -18,14 +19,13 @@ import {useAuth} from "./AuthContext"
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState({});
   const { isAuthenticated } = useAuth();
 
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated);
 
   // פונקציה לקבלת סל הקניות
   const fetchCart = () => {
-    console.log("hiiii")
     if (isLoggedIn) {
       getUserCart()
         .then((res) => {
@@ -40,8 +40,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // פונקציה לעדכון הסל
-  const updateCart = (cart) => {
+  const updateCartToLocal = (cart) => {
     addLocalCart(cart)
     .then((res) => {
         setCart(res.cart);
@@ -51,10 +50,9 @@ export const CartProvider = ({ children }) => {
       });
   }
 
-  // פונקציה לעדכון מוצר בסל
   const updateProductInCart = (product, newAmount, amount) => {
     if (isLoggedIn)
-      addToCart({ product: product, amount: newAmount - amount })
+      updateCart({ product: product, amount: newAmount - amount })
         .then((res) => {
           console.log(res);
           setCart((prevCart) => {
@@ -71,7 +69,7 @@ export const CartProvider = ({ children }) => {
           console.log(err);
         });
     else
-      updateCart({
+      addToCart({
         productId: product.id,
         amount: newAmount - amount,
       })
@@ -92,7 +90,6 @@ export const CartProvider = ({ children }) => {
         });
   };
 
-  // פונקציה להוספת מוצר לסל
   const addProductToCart = (product, amountToBuy) => {
     if (isLoggedIn)
       addCart({ productId: product.id, amount: amountToBuy })
@@ -129,11 +126,11 @@ export const CartProvider = ({ children }) => {
         });
   };
 
-  // פונקציה להסרת מוצר מהסל
   const removeProductFromCart = (productId) => {
     if (isLoggedIn)
-      removeFromCart({ productId })
+      deleteFromCart(productId)
         .then((res) => {
+          console.log(res)
           setCart((prevCart) => {
             const updatedProducts = prevCart.products.filter(
               (p) => !(p.product.id === productId)
@@ -145,8 +142,9 @@ export const CartProvider = ({ children }) => {
           console.log(err);
         });
     else
-      deleteFromCart(productId)
+      removeFromCart(productId)
         .then((res) => {
+          console.log(res)
           setCart((prevCart) => {
             const updatedProducts = prevCart.products.filter(
               (p) => !(p.product.id === productId)
@@ -183,20 +181,18 @@ export const CartProvider = ({ children }) => {
     const localCart = localStorage.getItem("cart");
     if (localCart) {
       const parsedLocalCart = JSON.parse(localCart);
-      updateCart(parsedLocalCart);//await
+      updateCartToLocal(parsedLocalCart);
       localStorage.removeItem("cart");
     }
     setIsLoggedIn(true);
   };
 
-  // פונקציה להתנתקות
   const logout = () => {
     setIsLoggedIn(false);
-    setCart([]);
+    setCart({});
     // כאן תוכלי להוסיף לוגיקה נוספת להתנתקות מהשרת
   };
 
-  // טעינת הסל בעת טעינת האפליקציה
   useEffect(() => {
     fetchCart();
   }, [isLoggedIn]);
@@ -209,7 +205,7 @@ export const CartProvider = ({ children }) => {
         updateProductInCart,
         removeProductFromCart,
         deleteMyCart,
-        updateCart,
+        updateCartToLocal,
         fetchCart,
         syncCartOnLogin,
         logout,

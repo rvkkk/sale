@@ -11,22 +11,21 @@ import {
   Tooltip,
   IconButton,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
-import { HeartIcon } from "../Icons";
+import React, { memo, useState } from "react";
+import { HeartFullIcon, HeartIcon } from "../Icons";
 import { routes } from "../../routes";
 import Badge from "../Badge";
 import Button from "../Button";
 import ProductBuyCard from "../ProductBuyCard";
 import ProductTimeClock from "../ProductTimeClock";
-import { addToWishList, removeFromWishList } from "../../utils/wishList";
-import { addNewWish, deleteFromWishList } from "../../utils/api/wishLists";
 import { addOffer } from "../../utils/api/offers";
 import { useDisclosure } from "@chakra-ui/react";
-import { Block } from "@mui/icons-material";
+import { useWishList } from "../Contexts/WishListContext";
 
-export default function CartListItem(props) {
+export default memo(function CartListItem(props) {
   const [inWishList, setInWishList] = useState(false);
-  const token = window.localStorage.getItem("token");
+  const { addProductToWishList,
+    removeProductFromWishList } = useWishList()
   const product = props.data;
   const { onOpen, onClose, isOpen } = useDisclosure();
 
@@ -38,7 +37,7 @@ export default function CartListItem(props) {
       .catch((err) => console.log(err));
   };
 
-  const addWish = () => {
+  /*const addWish = () => {
     if (token === null)
       addToWishList({
         product: {
@@ -96,7 +95,7 @@ export default function CartListItem(props) {
         .catch((err) => {
           console.log(err);
         });
-  };
+  };*/
 
   const removeDecimal = (num) => {
     try {
@@ -195,11 +194,16 @@ export default function CartListItem(props) {
                       borderRadius="full"
                       fontSize="25"
                     >
-                      {!inWishList ? (
+                       {!inWishList ? (
+                      <HeartIcon onClick={() => { addProductToWishList(product, 1); setInWishList(true)}} />
+                    ) : (
+                      <HeartFullIcon onClick={() => { removeProductFromWishList(product._id); setInWishList(false)}} />
+                    )}
+                      {/*!inWishList ? (
                         <HeartIcon onClick={addWish} />
                       ) : (
                         <HeartIcon fill="#0738D2" onClick={removeWish} />
-                      )}
+                      )*/}
                     </IconButton>
                   </Tooltip>
                 </Flex>
@@ -329,4 +333,4 @@ export default function CartListItem(props) {
       </Card>
     </>
   );
-}
+})

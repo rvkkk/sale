@@ -178,12 +178,12 @@ export default function Products({
                   imgUrl={product.images[0]}
                   price={product.price}
                   beforePrice={
-                    product["price-before-discount"] !== 0
+                    product["price-before-discount"]
                       ? product["price-before-discount"]
                       : null
                   }
                   discount={
-                    product["price-before-discount"] !== 0
+                    product["price-before-discount"]
                       ? Math.round(((product["price-before-discount"] - product.price) /
                           product["price-before-discount"]) *
                         100)

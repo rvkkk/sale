@@ -1,105 +1,62 @@
 import axios from "axios";
 
 const baseURL = "https://sale-bid.df.r.appspot.com/";
-const headers = {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-};
+
+const axiosInstance = axios.create({
+  baseURL,
+  withCredentials: true
+});
 
 export const getEmailContactForms = (email) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}contact-forms/?email=${email}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get(`contact-forms/?email=${email}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching email contact forms:", err);
+      throw err;
+    });
 };
 
 export const getContactForms = () => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}contact-forms`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get('contact-forms')
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching contact forms:", err);
+      throw err;
+    });
 };
 
 export const getContactForm = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`${baseURL}contact-forms/${id}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-       // onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.get(`contact-forms/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error fetching contact form:", err);
+      throw err;
+    });
 };
 
 export const addContactForm = (fullName, email, subject, message) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .post(`${baseURL}contact-forms`, { fullName, email, subject, message }, headers)
-      .then((res) => {
-        console.log(res);
-        resolve(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axios.post(`${baseURL}contact-forms`, { fullName, email, subject, message })
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error adding contact form:", err);
+      throw err;
+    });
 };
 
-export const updateContactForm = (
-  id,
-  fullName,
-  email,
-  subject,
-  message,
-) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .patch(`${baseURL}contact-forms/${id}`, {
-        fullName,
-        email,
-        subject,
-        message,
-      })
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+export const updateContactForm = (id, fullName, email, subject, message) => {
+  return axiosInstance.patch(`contact-forms/${id}`, { fullName, email, subject, message })
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error updating contact form:", err);
+      throw err;
+    });
 };
 
 export const deleteContactForm = (id) => {
-  return new Promise((resolve, reject) => {
-    axios
-      .delete(`${baseURL}contact-forms/${id}`)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        //onTokenBroken();
-        reject(err);
-      });
-  });
+  return axiosInstance.delete(`contact-forms/${id}`)
+    .then(res => res.data)
+    .catch(err => {
+      console.error("Error deleting contact form:", err);
+      throw err;
+    });
 };

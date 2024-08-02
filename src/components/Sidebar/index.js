@@ -22,31 +22,21 @@ import {
 } from "../Icons";
 import { useState, useEffect } from "react";
 import { getUserProfile } from "../../utils/api/users";
+import { useAuth } from "../Contexts/AuthContext";
 
 export default function Sidebar() {
   const [user, setUser] = useState(null);
   const [show, setShow] = useState(false);
-  const token = window.localStorage.getItem("token");
+  const { isAuthenticated, logout} = useAuth();
 
   useEffect(() => {
-    if (token !== null) {
+    if (isAuthenticated) {
       getUserProfile().then((res) => {
         setUser(res.user);
         setShow(true);
-        /*const userName = res.userName;
-        let profileImage = res.profileImage;
-        profileImage.blob().then((url) => {
-          profileImage = URL.createObjectURL(url);
-          setUser({ userName, profileImage });
-        });*/
       });
     }
-  }, [token]);
-
-  const Logout = () => {
-    localStorage.removeItem("token");
-    window.location.href = routes.HOME.path;
-  };
+  }, [isAuthenticated]);
 
   return (
     <Box
@@ -54,6 +44,7 @@ export default function Sidebar() {
       bg={!show ? "cartBack" : "white"}
       py="20"
       position="relative"
+      display={{base: "none", lg: "block"}}
     >
       {show ? (
         <>
@@ -129,7 +120,7 @@ export default function Sidebar() {
               </Text>
             </Flex>
 
-            <Flex alignItems="center" gap="2" onClick={() => Logout()}>
+            <Flex alignItems="center" gap="2" onClick={() => logout()}>
               <LogoutIcon />
               <Text fontWeight="medium" color="naturalDark">
                 התנתק

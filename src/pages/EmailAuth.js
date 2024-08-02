@@ -132,18 +132,18 @@ export default function EmailAuth() {
 
   useEffect(() => {
     if (!showPassword) {
-      setLoading(true);
+      //setLoading(true);
       onOpen();
       setTimeout(() => {
         onClose();
       }, 3000);
-      sendEmailAuth(email)
+      /*sendEmailAuth(email)
         .then((res) => {
           if (res.status === "ok") setLoading(false);
         })
         .catch((err) => console.log(err));
-    }
-  }, []);
+    }*/
+}}, []);
 
   return (
     <>

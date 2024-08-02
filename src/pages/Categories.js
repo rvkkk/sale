@@ -54,7 +54,7 @@ export default function Categories() {
     if (category !== "main-categories")
       getProductsByMainCategory(category, 1, 100)
         .then((res) => {
-          setProducts(res.products.products);
+          setProducts(res.products);
           console.log(res);
         })
         .catch((err) => {

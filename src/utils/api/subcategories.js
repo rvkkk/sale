@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "https://sale-bid.df.r.appspot.com/";
+const baseURL = "http://localhost:3001/"//"https://sale-bid.df.r.appspot.com/";
 
 const axiosInstance = axios.create({
   baseURL,
@@ -8,7 +8,7 @@ const axiosInstance = axios.create({
 });
 
 export const getSubcategory = (title) => {
-  return axiosInstance.get(`subcategory/${title}`)
+  return axios.get(`${baseURL}subcategory/${title}`)
     .then(res => res.data)
     .catch(err => {
       console.error("Error fetching subcategory:", err);
@@ -17,7 +17,7 @@ export const getSubcategory = (title) => {
 };
 
 export const getSubcategoriesOfCategory = (title) => {
-  return axiosInstance.get(`subcategories-category/${title}`)
+  return axios.get(`${baseURL}subcategories-category/${title}`)
     .then(res => res.data)
     .catch(err => {
       console.error("Error fetching subcategories of category:", err);
@@ -26,7 +26,7 @@ export const getSubcategoriesOfCategory = (title) => {
 };
 
 export const getSubcategoriesOfSubcategory = (title) => {
-  return axiosInstance.get(`subcategories/${title}`)
+  return axios.get(`${baseURL}subcategories/${title}`)
     .then(res => res.data)
     .catch(err => {
       console.error("Error fetching subcategories of subcategory:", err);

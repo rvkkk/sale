@@ -1,9 +1,9 @@
 import { Flex, Image } from "@chakra-ui/react";
-import React from "react";
+import React, { memo } from "react";
 import Input from "../Input";
 import { ExeptionInput } from "../Input";
 
-export default function CardPayment(props) {
+export default memo(function CardPayment(props) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, index) => currentYear + index);
   const months = Array.from({ length: 12 }, (_, index) => index + 1);
@@ -57,4 +57,4 @@ export default function CardPayment(props) {
       </Flex>
     </Flex>
   );
-}
+})

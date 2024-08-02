@@ -39,18 +39,18 @@ export const addToCart = (product) => {
   });
 };
 
-export const removeFromCart = (product) => {
+export const removeFromCart = (productId) => {
   return new Promise((resolve, reject) => {
     const cart = localStorage.getItem("cart");
     if (cart) {
       const cartObj = JSON.parse(cart);
       const index = cartObj.products.findIndex(
-        (p) => p.product.id === product.productId
+        (p) => p.product.id === productId
       );
       if (index !== -1) {
         let newProducts = cartObj.products;
         for (const p of newProducts)
-          if (p.product.id === product.productId) newProducts.pop(p);
+          if (p.product.id === productId) newProducts.pop(p);
         cartObj.products = newProducts;
         localStorage.setItem("cart", JSON.stringify(cartObj));
         resolve(cartObj);

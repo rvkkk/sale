@@ -38,18 +38,18 @@ export const addToWishList = (product) => {
   });
 };
 
-export const removeFromWishList = (product) => {
+export const removeFromWishList = (productId) => {
   return new Promise((resolve, reject) => {
     const wishList = localStorage.getItem("wish-list");
     if (wishList) {
       const wishListObj = JSON.parse(wishList);
       const index = wishListObj.products.findIndex(
-        (p) => p.product.id === product.productId
+        (p) => p.product.id === productId
       );
       if (index !== -1) {
         let newProducts = wishListObj.products;
         for (const p of newProducts)
-          if (p.product.id === product.productId) newProducts.pop(p);
+          if (p.product.id === productId) newProducts.pop(p);
         wishListObj.products = newProducts;
         localStorage.setItem("wish-list", JSON.stringify(wishListObj));
         resolve(wishListObj);

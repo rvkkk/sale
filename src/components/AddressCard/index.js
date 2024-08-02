@@ -1,8 +1,8 @@
 import { Flex, Spacer, Text } from "@chakra-ui/react";
-import React from "react";
+import React, {memo} from "react";
 import Button from "../Button";
 
-export default function AddressCard(props) {
+export default memo(function AddressCard(props) {
   return (
     <Flex
       w="327px"
@@ -44,4 +44,4 @@ export default function AddressCard(props) {
       </Flex>
     </Flex>
   );
-}
+})
